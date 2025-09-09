@@ -1,0 +1,8 @@
+// Pedro Tuning Guide ⬇️⬇️⬇️⬇️
+https://pedropathing.com/docs/pathing/constants
+
+// Pedro Visualizer ⬇️⬇️⬇️⬇️
+https://visualizer.pedropathing.com/
+
+// Pedro Quickstart ⬇️⬇️⬇️⬇️
+https://github.com/Pedro-Pathing/Quickstart/tree/master
