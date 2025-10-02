@@ -25,7 +25,7 @@ public class sampleMecanumTeleOp extends CommandOpMode {
 
     public DcMotorEx leftFront, rightFront, leftBack, rightBack;
     PinpointOdo odo;
-    private Limelight3A limelight;
+    //private Limelight3A limelight;
     public static double HEADING_KP_TX = 0.023;
     public static double ROTATION_MIN_POWER = 0.0;
     private boolean isHeadingLocked = true;
@@ -40,9 +40,9 @@ public class sampleMecanumTeleOp extends CommandOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         driver = new GamepadEx(gamepad1);
 
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
-        limelight.start();
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(0);
+//        limelight.start();
 
         odo = hardwareMap.get(PinpointOdo.class, "odo");
         odo.setOffsets(pinpointXOffset, pinpointYOffset);
@@ -76,28 +76,28 @@ public class sampleMecanumTeleOp extends CommandOpMode {
         double y = gamepad1.left_stick_y;
         double rx = gamepad1.right_stick_x;
 
-        LLResult result = limelight.getLatestResult();
+//        LLResult result = limelight.getLatestResult();
 
 
-
-        if (isHeadingLocked) {
-
-
-            double error = result.getTxNC();
-
-
-            if (result.isValid()) {
-                //finalRotation = (error * HEADING_KP_TX) + (integralSum * HEADING_KI_TX) + (derivative * HEADING_KD_TX);
-                finalRotation = (error * HEADING_KP_TX);
-
-                if (Math.abs(finalRotation) > 0 && Math.abs(finalRotation) < ROTATION_MIN_POWER) {
-                    rx = Math.signum(finalRotation) * ROTATION_MIN_POWER;
-                }
-            } else {
-                rx = 0;
-            }
-
-        }
+//
+//        if (isHeadingLocked) {
+//
+//
+//            double error = result.getTxNC();
+//
+//
+//            if (result.isValid()) {
+//                //finalRotation = (error * HEADING_KP_TX) + (integralSum * HEADING_KI_TX) + (derivative * HEADING_KD_TX);
+//                finalRotation = (error * HEADING_KP_TX);
+//
+//                if (Math.abs(finalRotation) > 0 && Math.abs(finalRotation) < ROTATION_MIN_POWER) {
+//                    rx = Math.signum(finalRotation) * ROTATION_MIN_POWER;
+//                }
+//            } else {
+//                rx = 0;
+//            }
+//
+//        }
 
         double rotX = x * Math.cos(-botHeading) + y * Math.sin(-botHeading);
         double rotY = x * Math.sin(botHeading) + y * Math.cos(botHeading);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -15,8 +16,12 @@ import org.firstinspires.ftc.teamcode.support.PinpointOdo;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(8);
-
+            .mass(8)
+            .forwardZeroPowerAcceleration(-55.6006)
+            .lateralZeroPowerAcceleration(-72.934)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.025))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.1, 0, 0.1, .03));
+ 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
             .rightFrontMotorName("rightFront")
@@ -27,7 +32,14 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(5);//placeholder
+            .xVelocity(60.355)
+            .yVelocity(51.472);
+    //-71.408
+    //-72.591
+    //-71.820
+    //-75.915
+
+
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(-5)
