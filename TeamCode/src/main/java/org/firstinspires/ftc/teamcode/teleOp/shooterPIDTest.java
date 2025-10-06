@@ -1,12 +1,22 @@
 package org.firstinspires.ftc.teamcode.teleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+
+/**
+ * Start with kF auto, then raise/lower kF until the motor reaches near target at steady state (low error).
+ * Add small kP to tighten response (too high = oscillation).
+ * Only add kI if you see steady-state error that kF+kP can’t fix, prob won't be needed
+ * Add kD to damp oscillations during spin-up, might not be needed
+ */
 @TeleOp
 @Config
 public class shooterPIDTest extends CommandOpMode {
@@ -19,48 +29,112 @@ public class shooterPIDTest extends CommandOpMode {
     public static double GEAR_RATIO = 2.5;
     public static double TICKS_PER_REV = 103.8;
 
+
+    // PIDF (velocity) //TODO: Tune Values
+    public static double kP = 0.0;
+    public static double kI = 0.0;
+    public static double kD = 0.0;
+    public static double kF = 0.0;
+
+    // Toggles shooter on and off in dashboard
     public static boolean runShooter = false;
+    private FtcDashboard dash;
 
     @Override
     public void initialize() {
-        shooter = hardwareMap.get(DcMotorEx.class, "m1");
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        dash = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
 
+        shooter = hardwareMap.get(DcMotorEx.class, "m1");
+
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        applyPIDF();
 
         driver = new GamepadEx(gamepad1);
+
         telemetry.addLine("init done");
         telemetry.update();
+    }
+
+    //TODO: test if this works, if not remove
+    private void applyPIDF() {
+        double kFLocal = kF;
+        if (kFLocal == 0.0) {
+            // Based on achievable max ticks/s reported by the SDK
+            // Good starting point for later tuning in Dashboard.
+            double maxTps = shooter.getMotorType().getAchieveableMaxTicksPerSecond();
+            if (maxTps <= 0) maxTps = (1620.0 * TICKS_PER_REV) / 60.0;
+            // REV internal scaling expects kF around 32767/maxVelocity as a reasonable baseline
+            kFLocal = 32767.0 / maxTps;
+        }
+        shooter.setVelocityPIDFCoefficients(kP, kI, kD, kFLocal);
     }
 
     @Override
     public void run() {
         super.run();
 
-        double motorRPM = MOTOR_RPM;
-        double targetTicksPerSec = (motorRPM * TICKS_PER_REV) / 60.0;
+        /** Live PIDF updates via dashboard */
+        applyPIDF();
 
-        if (gamepad1.right_bumper) {
-            runShooter = !runShooter;
-        }
+        double targetMotorRPM = TARGET_RPM / GEAR_RATIO;
+        double targetTicksPerSec = (targetMotorRPM * TICKS_PER_REV) / 60.0;
 
         if (runShooter) {
-            shooter.setVelocity(targetTicksPerSec);
+            shooter.setVelocity(targetTicksPerSec); // ticks/s
         } else {
             shooter.setVelocity(0);
         }
 
-        double currTicksPerSec = shooter.getVelocity(); // ticks/s (motor)
-        double currMotorRPM    = (currTicksPerSec * 60.0) / TICKS_PER_REV;
-        double currShooterRPM  = currMotorRPM * GEAR_RATIO;
+        // Gets current velo of motor
+        double currTicksPerSec = shooter.getVelocity(); // ticks/s of motor
+        double currMotorRPM = (currTicksPerSec * 60.0) / TICKS_PER_REV;
+        double currShooterRPM = currMotorRPM * GEAR_RATIO;
 
-        telemetry.addData("Target Shooter RPM", TARGET_RPM);
-        telemetry.addData("Target Motor RPM", motorRPM);
-        telemetry.addData("Target Ticks/s", targetTicksPerSec);
+        // Tuning Stuff
+        double errorMotorRPM = targetMotorRPM - currMotorRPM;
+        double errorShooterRPM = TARGET_RPM - currShooterRPM;
 
-        telemetry.addData("Curr Motor RPM", "%.1f", currMotorRPM);
-        telemetry.addData("Curr Shooter RPM (est.)", "%.1f", currShooterRPM);
-        telemetry.addData("Curr Ticks/s", "%.0f", currTicksPerSec);
-        telemetry.update();
+        // ===== Graphs on FTC Dashboard =====
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("target_shooter_rpm", TARGET_RPM);
+        packet.put("current_shooter_rpm", currShooterRPM);
+        packet.put("target_motor_rpm", targetMotorRPM);
+        packet.put("current_motor_rpm", currMotorRPM);
+        packet.put("error_shooter_rpm", errorShooterRPM);
+        packet.put("error_motor_rpm", errorMotorRPM);
+        packet.put("motor_ticks_per_sec", currTicksPerSec);
+        dash.sendTelemetryPacket(packet);
     }
 }
+
+
+//        double motorRPM = MOTOR_RPM;
+//        double targetTicksPerSec = (motorRPM * TICKS_PER_REV) / 60.0;
+//
+//        if (gamepad1.right_bumper) {
+//            runShooter = !runShooter;
+//        }
+//
+//        if (runShooter) {
+//            shooter.setVelocity(targetTicksPerSec);
+//        } else {
+//            shooter.setVelocity(0);
+//        }
+//
+//        double currTicksPerSec = shooter.getVelocity(); // ticks/s (motor)
+//        double currMotorRPM    = (currTicksPerSec * 60.0) / TICKS_PER_REV;
+//        double currShooterRPM  = currMotorRPM * GEAR_RATIO;
+//
+//        telemetry.addData("Target Shooter RPM", TARGET_RPM);
+//        telemetry.addData("Target Motor RPM", motorRPM);
+//        telemetry.addData("Target Ticks/s", targetTicksPerSec);
+//
+//        telemetry.addData("Curr Motor RPM", "%.1f", currMotorRPM);
+//        telemetry.addData("Curr Shooter RPM (est.)", "%.1f", currShooterRPM);
+//        telemetry.addData("Curr Ticks/s", "%.0f", currTicksPerSec);
+//        telemetry.update();
+
