@@ -13,7 +13,7 @@ public class mecanumDB extends SubsystemBase {
     public DcMotorEx backRightMotor;
 
 
-    public void init(HardwareMap hardwareMap) {
+    public mecanumDB(HardwareMap hardwareMap) {
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "fl");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
