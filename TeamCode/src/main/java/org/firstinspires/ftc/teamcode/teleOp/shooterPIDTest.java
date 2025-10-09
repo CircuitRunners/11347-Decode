@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-
 /**
  * Start with kF auto, then raise/lower kF until the motor reaches near target at steady state (low error).
  * Add small kP to tighten response (too high = oscillation).
@@ -24,17 +23,19 @@ public class shooterPIDTest extends CommandOpMode {
     public GamepadEx driver;
 
     // Dashboard-tunable constants
-    public static double TARGET_RPM = 4000.0;
-    public static double MOTOR_RPM = 1620.0;
+    public static double TARGET_RPM = 3500.0; // 4000
+    public static double MOTOR_RPM = 1620.0; // 1410
     public static double GEAR_RATIO = 2.5;
     public static double TICKS_PER_REV = 103.8;
 
 
     // PIDF (velocity) //TODO: Tune Values
-    public static double kP = 0.0;
+    public static double kP = 35.0; //15.0
     public static double kI = 0.0;
-    public static double kD = 0.0;
-    public static double kF = 0.0;
+    public static double kD = 10.0;
+    public static double kF = 13.0; //13.7
+
+    public double kfValue;
 
     // Toggles shooter on and off in dashboard
     public static boolean runShooter = false;
@@ -49,6 +50,8 @@ public class shooterPIDTest extends CommandOpMode {
 
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         applyPIDF();
@@ -70,6 +73,7 @@ public class shooterPIDTest extends CommandOpMode {
             // REV internal scaling expects kF around 32767/maxVelocity as a reasonable baseline
             kFLocal = 32767.0 / maxTps;
         }
+        kfValue = kFLocal;
         shooter.setVelocityPIDFCoefficients(kP, kI, kD, kFLocal);
     }
 
@@ -107,6 +111,7 @@ public class shooterPIDTest extends CommandOpMode {
         packet.put("error_shooter_rpm", errorShooterRPM);
         packet.put("error_motor_rpm", errorMotorRPM);
         packet.put("motor_ticks_per_sec", currTicksPerSec);
+        packet.put("kF Local Value: ", kfValue);
         dash.sendTelemetryPacket(packet);
     }
 }
