@@ -29,7 +29,7 @@ public class shooterPIDTest extends CommandOpMode {
     public static double TICKS_PER_REV = 103.8;
 
 
-    // PIDF (velocity) //TODO: Tune Values
+    // PIDF (velocity)
     public static double kP = 35.0; //15.0
     public static double kI = 0.0;
     public static double kD = 10.0;
