@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  */
 @TeleOp
 @Config
-public class shooterPIDTest extends CommandOpMode {
+public class ShooterPIDTest extends CommandOpMode {
     private DcMotorEx shooter;
     public GamepadEx driver;
 
@@ -115,31 +115,3 @@ public class shooterPIDTest extends CommandOpMode {
         dash.sendTelemetryPacket(packet);
     }
 }
-
-
-//        double motorRPM = MOTOR_RPM;
-//        double targetTicksPerSec = (motorRPM * TICKS_PER_REV) / 60.0;
-//
-//        if (gamepad1.right_bumper) {
-//            runShooter = !runShooter;
-//        }
-//
-//        if (runShooter) {
-//            shooter.setVelocity(targetTicksPerSec);
-//        } else {
-//            shooter.setVelocity(0);
-//        }
-//
-//        double currTicksPerSec = shooter.getVelocity(); // ticks/s (motor)
-//        double currMotorRPM    = (currTicksPerSec * 60.0) / TICKS_PER_REV;
-//        double currShooterRPM  = currMotorRPM * GEAR_RATIO;
-//
-//        telemetry.addData("Target Shooter RPM", TARGET_RPM);
-//        telemetry.addData("Target Motor RPM", motorRPM);
-//        telemetry.addData("Target Ticks/s", targetTicksPerSec);
-//
-//        telemetry.addData("Curr Motor RPM", "%.1f", currMotorRPM);
-//        telemetry.addData("Curr Shooter RPM (est.)", "%.1f", currShooterRPM);
-//        telemetry.addData("Curr Ticks/s", "%.0f", currTicksPerSec);
-//        telemetry.update();
-
