@@ -21,7 +21,7 @@ public class outtake extends SubsystemBase {
         aimingServo = hardwareMap.get(Servo.class, "launchingServo");
 
 }
-    public void setContiniousOuttake(double power) {
+    public void setContinuousOuttake(double power) {
         continiousOuttake.setPower(power);
 
 

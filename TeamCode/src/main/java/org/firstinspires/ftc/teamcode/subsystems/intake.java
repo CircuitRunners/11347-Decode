@@ -13,11 +13,11 @@ public class intake extends SubsystemBase {
         transferMech = hardwareMap.get(DcMotorEx.class, "transfer");
     }
 
-    public void runIntake(double forward) {
-        intakeRoller.setPower(forward);
+    public void runIntake(double power) {
+        intakeRoller.setPower(power);
     }
 
-    public void setTransferMech(double power) {
-            transferMech.setPower(power);
+    public void setTransfer(double power) {
+        transferMech.setPower(power);
     }
 }
