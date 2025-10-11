@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
@@ -18,6 +19,9 @@ public class mecanumDB extends SubsystemBase {
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "fr");
         backLeftMotor = hardwareMap.get(DcMotorEx.class, "bl");
         backRightMotor = hardwareMap.get(DcMotorEx.class, "br");
+
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         DcMotorEx[] motors = new DcMotorEx[]{
                 frontLeftMotor,frontRightMotor, backLeftMotor, backRightMotor

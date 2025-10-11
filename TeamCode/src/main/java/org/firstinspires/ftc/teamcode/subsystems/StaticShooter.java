@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,34 +15,39 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  * StaticShooter subsystem controls a single flywheel-style shooter.
  * Provides PIDF tuning, velocity targeting, and telemetry integration with FTC Dashboard.
  */
+@Config
 public class StaticShooter {
     // --- Hardware ---
     private DcMotorEx shooter;
 
     // --- Dashboard & Telemetry ---
     private FtcDashboard dash;
-    private Telemetry telemetry;
 
     // --- Shooter Constants ---
-    private double TARGET_RPM = 3500.0;         // desired shooter RPM
-    private double MOTOR_RPM = 1620.0;          // motor RPM (based on max motor rpm)
-    private double GEAR_RATIO = 2.5;            // gear ratio from motor to shooter
-    private double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
+    private static double TARGET_RPM = 3500.0;         // desired shooter RPM
+    private static double MOTOR_RPM = 1620.0;          // motor RPM (based on max motor rpm)
+    private static double GEAR_RATIO = 2.5;            // gear ratio from motor to shooter
+    private static double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
 
     // --- PIDF Coefficients ---
-    public double kP = 35.0;
+    //working value 35 on October 9th, 2025
+/*    public double kP = 35.0;
     public double kI = 0.0;
     public double kD = 10.0;
-    public double kF = 13.0;
+    public double kF = 13.0;*/
+    public static double kP = 35.0;
+    public static double kI = 0.0;
+    public static double kD = 10.0;
+    public static double kF = 13.0;
 
     /**
      * Initialises the shooter in the hardwareMap, sets default shooter values
-     * @param hardwareMap           pulls HardwareMap from teleOp class
-     *                              to initialise motor
-     * @param defaultTargetRPM      sets the default target RPM of the
-     *                              shooter
-     * @param defaultGearRatio      sets the default shooter gear ratio
-     * @param defaultTicks          sets the default ticks of the motor
+     * @param hardwareMap pulls HardwareMap from teleOp class
+     *                    to initialise motor
+     * @param defaultTargetRPM sets the default target RPM of the
+     *                         shooter
+     * @param defaultGearRatio sets the default shooter gear ratio
+     * @param defaultTicks     sets the default ticks of the motor
      */
     public StaticShooter(HardwareMap hardwareMap, Telemetry telemetry, double defaultTargetRPM,
                          double defaultMotorRPM, double defaultGearRatio, double defaultTicks) {
@@ -70,7 +76,7 @@ public class StaticShooter {
     }
 
     public StaticShooter(HardwareMap hardwareMap, Telemetry telemetry) {
-        new StaticShooter(hardwareMap, telemetry, TARGET_RPM, MOTOR_RPM, GEAR_RATIO, TICKS_PER_REV);
+        this(hardwareMap, telemetry, TARGET_RPM, MOTOR_RPM, GEAR_RATIO, TICKS_PER_REV);
     }
 
     // --- PIDF ---
@@ -90,7 +96,7 @@ public class StaticShooter {
     }
 
     /** Applies current shooter velocity PIDF coefficients */
-    private void applyPIDF() {
+    public void applyPIDF() {
         shooter.setVelocityPIDFCoefficients(kP, kI, kD, kF);
     }
 
@@ -145,17 +151,12 @@ public class StaticShooter {
     public void runShooter() {
         double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
         shooter.setVelocity(targetTicksPerSec);
-        telemetry.addData("Target RPM", TARGET_RPM);
-        telemetry.addData("Target Ticks/sec", targetTicksPerSec);
-        telemetry.addData("Actual Velocity", shooter.getVelocity());
     }
 
     /** Stops all shooter motion immediately. */
     public void eStop() {
         shooter.setPower(0);
         shooter.setVelocity(0);
-        telemetry.addLine("Shooter Stopped!");
-        telemetry.update();
     }
 
     /**

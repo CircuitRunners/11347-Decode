@@ -16,27 +16,24 @@ public class outtake extends SubsystemBase {
 
 
     public outtake(HardwareMap hardwareMap) {
-        continiousOuttake = hardwareMap.get(DcMotorEx.class, "outtake");
+//        continiousOuttake = hardwareMap.get(DcMotorEx.class, "outtake");
         blockingServo= hardwareMap.get(Servo.class, "blockingServo");
         aimingServo = hardwareMap.get(Servo.class, "launchingServo");
+    }
 
-}
     public void setContinuousOuttake(double power) {
         continiousOuttake.setPower(power);
+    }
 
-
-
-        }
     public void setBlock () {
         blockingServo.setPosition(blockingPosition);
-
     }
+
     public void nonBlock() {
         blockingServo.setPosition(nonBlockingPosition);
     }
+
     public void aiming (boolean isUp, boolean isDown){
         double currentPosition = aimingServo.getPosition();
     }
-
-
-    }
+}

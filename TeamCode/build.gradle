@@ -46,10 +46,6 @@ dependencies {
 }
 
 repositories {
-    flatDir {
-        dirs '../libs'
-    }
-
     maven {
         url = 'https://jitpack.io'
     }
