@@ -20,12 +20,12 @@ public class intake extends SubsystemBase {
     public void runIntake(double power) {
         double direction = (intake ? power : -power);
 
-        intakeRoller.setPower(-direction);
+        intakeRoller.setPower(-power);
     }
 
     public void setTransfer(double power) {
         double direction = (transfer ? power : -power);
 
-        transferMech.setPower(direction);
+        transferMech.setPower(power);
     }
 }
