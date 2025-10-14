@@ -7,7 +7,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class outtake extends SubsystemBase {
-    public DcMotorEx continiousOuttake;
+    public enum BlockPosition {
+        BLOCK(0, 0),
+        UNBLOCK(1,1);
+
+        public final double left, right;
+
+        BlockPosition (double left, double right) {
+            this.left = left;
+            this.right = right;
+        }
+    }
+
     public Servo blockingServo;
     public Servo blockingServoTwo;
     public Servo aimingServo;
@@ -17,16 +28,12 @@ public class outtake extends SubsystemBase {
     public double nonBlockingPosition=1;
     public double nonBlockingPositionTwo=1;
 
-
     public outtake(HardwareMap hardwareMap) {
-        continiousOuttake = hardwareMap.get(DcMotorEx.class, "outtake");
         blockingServo= hardwareMap.get(Servo.class, "blockingServoRight");
         blockingServoTwo= hardwareMap.get(Servo.class, "blockingServoLeft");
         aimingServo = hardwareMap.get(Servo.class, "launchingServo");
 
-}
-    public void setContiniousOuttake(double power) {
-        continiousOuttake.setPower(power);
+
 
 
 
