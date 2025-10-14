@@ -6,34 +6,70 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.support.RunAction;
+
 public class outtake extends SubsystemBase {
-    public DcMotorEx continiousOuttake;
-    public Servo blockingServo;
+    // === Enums ===
+    public enum BlockState {
+        BLOCK(0, 0),
+        UNBLOCK(1, 1);
+
+        public final double left, right;
+        BlockState(double left, double right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        public double getLeft() {
+            return left;
+        }
+
+        public double getRight() {
+            return right;
+        }
+    }
+
+    public enum AimState {
+        AIM_MAX(1),
+        AIM_MIN(0);
+
+        public final double position;
+        AimState(double position) {
+            this.position = position;
+        }
+
+        public double getPosition() {
+            return position;
+        }
+    }
+
+    public RunAction block, unblock;
+    public Servo blockingServoLeft, blockingServoRight;
     public Servo aimingServo;
 
-    public double blockingPosition = 0;
-    public double nonBlockingPosition=1;
-
-
     public outtake(HardwareMap hardwareMap) {
-//        continiousOuttake = hardwareMap.get(DcMotorEx.class, "outtake");
-        blockingServo= hardwareMap.get(Servo.class, "blockingServo");
+        blockingServoLeft = hardwareMap.get(Servo.class, "blockingLeft");
+        blockingServoRight = hardwareMap.get(Servo.class, "blockingRight");
         aimingServo = hardwareMap.get(Servo.class, "launchingServo");
+
+        blockingServoLeft.setPosition(BlockState.BLOCK.getLeft());
+        blockingServoRight.setPosition(BlockState.BLOCK.getRight());
+
+        aimingServo.setPosition(AimState.AIM_MIN.getPosition());
+        block = new RunAction(this::block);
+        unblock = new RunAction(this::unblock);
     }
 
-    public void setContinuousOuttake(double power) {
-        continiousOuttake.setPower(power);
+    public void block() {
+        setBlockPosition(BlockState.BLOCK);
     }
 
-    public void setBlock () {
-        blockingServo.setPosition(blockingPosition);
+    public void unblock() {
+        setBlockPosition(BlockState.UNBLOCK);
     }
 
-    public void nonBlock() {
-        blockingServo.setPosition(nonBlockingPosition);
-    }
-
-    public void aiming (boolean isUp, boolean isDown){
-        double currentPosition = aimingServo.getPosition();
+    public void setBlockPosition(BlockState state) {
+        blockingServoLeft.setPosition(state.getLeft());
+        blockingServoRight.setPosition(state.getRight());
     }
 }

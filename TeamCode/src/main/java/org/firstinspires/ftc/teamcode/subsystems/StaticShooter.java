@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -44,10 +43,16 @@ public class StaticShooter {
      * Initialises the shooter in the hardwareMap, sets default shooter values
      * @param hardwareMap pulls HardwareMap from teleOp class
      *                    to initialise motor
-     * @param defaultTargetRPM sets the default target RPM of the
-     *                         shooter
-     * @param defaultGearRatio sets the default shooter gear ratio
-     * @param defaultTicks     sets the default ticks of the motor
+     * @param telemetry Allows the class to add telemetry to the phone
+     * @param defaultTargetRPM Sets the default target RPM of the shooter
+     *                        Set to the initial target RPM of your
+     *                        shooter
+     * @param defaultMotorRPM Sets the default RPM of the motor
+     *                       Set to the RPM of the motor being used
+     * @param defaultGearRatio Sets the default shooter gear ratio
+     *                        Set to the gear ratio between the motor and shooterwheel
+     * @param defaultTicks Sets the default ticks of the motor
+     *                    Set to the encoder ticks of your motor
      */
     public StaticShooter(HardwareMap hardwareMap, Telemetry telemetry, double defaultTargetRPM,
                          double defaultMotorRPM, double defaultGearRatio, double defaultTicks) {
@@ -75,6 +80,7 @@ public class StaticShooter {
         telemetry.addLine("shooter Init Done");
     }
 
+    /// Only use if the constants in this file are correct
     public StaticShooter(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, TARGET_RPM, MOTOR_RPM, GEAR_RATIO, TICKS_PER_REV);
     }
@@ -82,12 +88,15 @@ public class StaticShooter {
     // --- PIDF ---
     /**
      * Sets shooter PIDF coefficients manually
-     * @param kp
-     * @param ki
-     * @param kd
-     * @param kf
+     * @param kf Set to a low value, just enough that the shooter wheel
+     *           begins to rotate
+     * @param kp Increase kP after kF until the shooter wheel reaches the target speed
+     * @param kd Try changing the target speed of the shooter from a low value
+     *           to a high value and vise versa. Use this to reduce the
+     *           oscillations when changing speeds
+     * @param ki Most times this won't need to be tuned
      */
-    public void setShooterPIDF(double kp, double ki, double kd, double kf) {
+    public void setShooterPIDF(double kf, double kp, double kd, double ki) {
         kP = kp;
         kI = ki;
         kD = kd;
