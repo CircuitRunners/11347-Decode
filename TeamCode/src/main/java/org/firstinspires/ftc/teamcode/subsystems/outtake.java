@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.support.RunAction;
 public class outtake extends SubsystemBase {
     // === Enums ===
     public enum BlockState {
-        BLOCK(0, 0),
+        BLOCK(0.5, 0.5),
         UNBLOCK(1, 1);
 
         public final double left, right;
@@ -50,7 +50,7 @@ public class outtake extends SubsystemBase {
     public outtake(HardwareMap hardwareMap) {
         blockingServoLeft = hardwareMap.get(Servo.class, "blockingLeft");
         blockingServoRight = hardwareMap.get(Servo.class, "blockingRight");
-        aimingServo = hardwareMap.get(Servo.class, "launchingServo");
+        aimingServo = hardwareMap.get(Servo.class, "lServo");
 
         blockingServoLeft.setPosition(BlockState.BLOCK.getLeft());
         blockingServoRight.setPosition(BlockState.BLOCK.getRight());
