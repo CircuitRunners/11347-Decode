@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 
 @Config
 @TeleOp
-public class lm1Teleop extends CommandOpMode {
+public class OutreachTeleop extends CommandOpMode {
     public mecanumDB drivebase;
     GamepadEx driver;
     GamepadEx manipulator;
