@@ -2,19 +2,18 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
-public class intake extends SubsystemBase {
+public class Intake extends SubsystemBase {
     public DcMotorEx intakeRoller;
     public DcMotorEx transferMech;
 
     public static boolean intakeDirection = true;
     public static boolean transferDirection = true;
 
-    public intake(HardwareMap hardwareMap) {
+    public Intake(HardwareMap hardwareMap) {
         intakeRoller = hardwareMap.get(DcMotorEx.class, "intake");
         transferMech = hardwareMap.get(DcMotorEx.class, "transfer");
 

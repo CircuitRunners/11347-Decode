@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
@@ -27,6 +28,8 @@ public class mecanumDB extends SubsystemBase {
         for (DcMotorEx motor : motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
+        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     private void setPowers(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
@@ -45,10 +48,10 @@ public class mecanumDB extends SubsystemBase {
         backRightMotor.setPower(backRightPower);
     }
     public void drive(double forward, double right, double rotate) {
-        double frontLeftPower = forward + right + rotate;
-        double frontRightPower = forward - right - rotate;
-        double backLeftPower = forward - right + rotate;
-        double backRightPower = forward + right - rotate;
+        double frontLeftPower = forward - right - rotate;
+        double frontRightPower = forward + right + rotate;
+        double backLeftPower = forward + right - rotate;
+        double backRightPower = forward - right + rotate;
 
         setPowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
