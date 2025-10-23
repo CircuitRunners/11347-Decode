@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.hardware.SRSHub;
+import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 /**
  * Localizer that uses an SRSHub-connected goBILDA Pinpoint for robot pose tracking.
@@ -69,8 +69,8 @@ public class SRSLocalizer implements Localizer {
     public void update() {
         hub.update();
 
-        double rawX = pinpoint.xPosition;
-        double rawY = pinpoint.yPosition;
+        double x = pinpoint.xPosition;
+        double y = pinpoint.yPosition;
         double rawHeading = pinpoint.hOrientation - headingOffset;
 
         if (Double.isNaN(lastRawHeading)) {
@@ -82,14 +82,12 @@ public class SRSLocalizer implements Localizer {
 
         totalHeading += delta * headingScalar;
 
-        double x = rawY;
-        double y = rawX;
-
         // Convert mm → inches and apply tuning multipliers
         currentPose = new Pose(
                 DistanceUnit.MM.toInches(x) * forwardMultiplier,
                 DistanceUnit.MM.toInches(y) * lateralMultiplier,
-                AngleUnit.normalizeRadians(totalHeading) * turningMultiplier
+                AngleUnit.normalizeRadians(
+                        totalHeading) * turningMultiplier
         );
 
         // Convert velocities to inches/s (still robot-relative)

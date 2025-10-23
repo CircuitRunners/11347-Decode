@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
@@ -34,8 +35,8 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(147.012)
-            .strafePodX(-28.042)
+            .forwardPodY(-28.042) //-147.012
+            .strafePodX(-147.012) //28.042
             .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
@@ -43,28 +44,28 @@ public class Constants {
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     /// IGNORE COMMENTED
-//    public static Follower createFollower(HardwareMap hardwareMap) {
-//        return new FollowerBuilder(followerConstants, hardwareMap)
-//                .setLocalizer(new SRSLocalizer(
-//                        hardwareMap,
-//                        1,
-//                        28.042f,
-//                        147.012f,
-//                        19.89436789f,
-//                        SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD,
-//                        SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED,
-//                        0
-//                ))
-//                .pathConstraints(pathConstraints)
-//                .mecanumDrivetrain(driveConstants)
-//                .build();
-//    }
-
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .pinpointLocalizer(localizerConstants)
+                .setLocalizer(new SRSLocalizer(
+                        hardwareMap,
+                        1,
+                        -28.042f,
+                        -147.012f,
+                        19.89436789f,
+                        SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD,
+                        SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED,
+                        0
+                ))
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
+
+//    public static Follower createFollower(HardwareMap hardwareMap) {
+//        return new FollowerBuilder(followerConstants, hardwareMap)
+//                .pinpointLocalizer(localizerConstants)
+//                .pathConstraints(pathConstraints)
+//                .mecanumDrivetrain(driveConstants)
+//                .build();
+//    }
 }

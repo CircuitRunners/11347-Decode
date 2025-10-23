@@ -23,9 +23,24 @@ public class intake extends SubsystemBase {
         intakeRoller.setPower(-power);
     }
 
-    public void setTransfer(double power) {
+    public void runTransfer(double power) {
         double direction = (transfer ? power : -power);
 
         transferMech.setPower(power);
+    }
+
+    public void shoot() {
+        runTransfer(1);
+        runIntake(1);
+    }
+
+    public void intaking() {
+        runTransfer(-0.2);
+        runIntake(1);
+    }
+
+    public void stop() {
+        runTransfer(0);
+        runIntake(0);
     }
 }

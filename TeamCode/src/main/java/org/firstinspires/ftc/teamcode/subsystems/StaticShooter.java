@@ -143,6 +143,10 @@ public class StaticShooter {
         GEAR_RATIO = gearRatio;
     }
 
+    public double getGearRatio() {
+        return GEAR_RATIO;
+    }
+
     /**
      * Changes the Ticks Per Revolution of the motor
      * Called Encoder Resolution on gobilda website
@@ -151,6 +155,10 @@ public class StaticShooter {
      */
     public void setTicksPerRev(double TicksPerRev) {
         TICKS_PER_REV = TicksPerRev;
+    }
+
+    public double getTicksPerRev() {
+        return TICKS_PER_REV;
     }
 
     /**

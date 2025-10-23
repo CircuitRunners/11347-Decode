@@ -49,7 +49,7 @@ public class TestingTeleOp extends CommandOpMode {
         db.drive(-forward, strafe, rotate);
 
         in.runIntake(driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER));
-        in.setTransfer(driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
+        in.runTransfer(driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
         if (driver.getButton(GamepadKeys.Button.RIGHT_BUMPER) && activeFast) {
             shooter.setTargetRPM(3500);

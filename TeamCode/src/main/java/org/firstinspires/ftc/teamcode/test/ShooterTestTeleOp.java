@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
  *  - D-Pad Up: Increase target RPM (+100)
  *  - D-Pad Down: Decrease target RPM (−100)
  */
-@TeleOp(name = "Shooter Command TeleOp", group = "Testing")
+@TeleOp(name = "Shooter Command TeleOp", group = "2")
 public class ShooterTestTeleOp extends CommandOpMode {
 
     private StaticShooter shooter;

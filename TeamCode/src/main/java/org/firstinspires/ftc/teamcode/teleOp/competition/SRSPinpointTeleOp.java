@@ -11,11 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
-import org.firstinspires.ftc.teamcode.hardware.SRSHub;
+import org.firstinspires.ftc.teamcode.support.SRSHub;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 
 @Deprecated
-@TeleOp(name="Main teleOp", group="1")
+@TeleOp(name="SRS Pinpoint teleOp", group="1")
 public class SRSPinpointTeleOp extends CommandOpMode {
     private SRSHub srs;
     private mecanumDB drive;
