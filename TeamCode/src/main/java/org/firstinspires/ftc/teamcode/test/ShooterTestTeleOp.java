@@ -36,7 +36,7 @@ public class ShooterTestTeleOp extends CommandOpMode {
 
         // --- Initialize Shooter Subsystem ---
         shooter = new StaticShooter(hardwareMap, telemetry);
-        curr = shooter.getTargetRPM();
+//        curr = shooter.getTargetRPM();
 
         // --- Gamepad Controls ---
         // Start shooter

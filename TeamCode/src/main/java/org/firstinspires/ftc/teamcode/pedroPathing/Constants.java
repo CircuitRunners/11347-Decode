@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -15,12 +17,24 @@ import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(11.1);
+            .mass(11.1)
+            .forwardZeroPowerAcceleration(-29.64945897478038)
+            .lateralZeroPowerAcceleration(-53.7580800784387)
+            .useSecondaryTranslationalPIDF(true)
+            .useSecondaryHeadingPIDF(true)
+            .useSecondaryDrivePIDF(true)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0, 0))
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.01, 0.015))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.2, 0, 0, 0.01))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.08, 0.01))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025, 0, 0.00001, 0.6, 0.01))
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02, 0, 0.000005, 0.6, 0.01))
+            ;
 
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
             100,
-            1,
+            0.7,
             1);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -32,7 +46,9 @@ public class Constants {
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .xVelocity(1.6704066118856116)
+            .yVelocity(3.927147842767667);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(-28.042) //-147.012

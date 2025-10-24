@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  * Provides PIDF tuning, velocity targeting, and telemetry integration with FTC Dashboard.
  */
 @Config
-public class StaticShooter {
+public class StaticShooter extends SubsystemBase {
     // --- Hardware ---
     private DcMotorEx shooter;
 
@@ -116,10 +117,6 @@ public class StaticShooter {
      */
     public void setTargetRPM(double targetRPM) {
         TARGET_RPM = targetRPM;
-    }
-
-    public double getTargetRPM() {
-        return TARGET_RPM;
     }
 
     /**

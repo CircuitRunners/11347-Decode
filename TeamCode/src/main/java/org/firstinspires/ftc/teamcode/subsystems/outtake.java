@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.support.RunAction;
 
@@ -30,8 +31,8 @@ public class outtake extends SubsystemBase {
     }
 
     public enum AimState {
-        AIM_MAX(0.35),
-        AIM_MIN(0.0);
+        AIM_MAX(0.45),
+        AIM_MIN(0.1);
 
         public final double position;
         AimState(double position) {
@@ -95,5 +96,15 @@ public class outtake extends SubsystemBase {
 
     public void aimMax() {
         aimingServo.setPosition(AimState.AIM_MAX.getPosition());
+    }
+
+    public void aiming(boolean up, boolean down) {
+        double currentPos = aimingServo.getPosition();
+
+        if (up) {
+            aimingServo.setPosition(Range.clip(currentPos-0.05, 0, 04.5));
+        } else if (down) {
+            aimingServo.setPosition(Range.clip(currentPos+0.05, 0, 04.5));
+        }
     }
 }

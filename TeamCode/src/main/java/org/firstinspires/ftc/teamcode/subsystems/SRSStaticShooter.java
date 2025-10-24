@@ -73,6 +73,6 @@ public class SRSStaticShooter extends StaticShooter {
      */
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addData("Shooter RPM", "%.1f", currentRPM);
-        telemetry.addData("Target RPM", "%.1f", getTargetRPM());
+//        telemetry.addData("Target RPM", "%.1f", getTargetRPM());
     }
 }

@@ -4,9 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -23,7 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 import org.firstinspires.ftc.teamcode.subsystems.outtake;
 import org.firstinspires.ftc.teamcode.support.SRSHub;
 
-import java.util.function.BooleanSupplier;
+import org.firstinspires.ftc.teamcode.commands.TransferCommand;
+import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
 @TeleOp(group="1")
 public class MainTeleOp extends CommandOpMode {
@@ -35,6 +33,7 @@ public class MainTeleOp extends CommandOpMode {
 
     // Stuff for resetting pinpoint location
     private float xOffset = 0, yOffset = 0, headingOffset = 0;
+    private static int shooterSpeed = 0;
 
     private GamepadEx driver, manipulator;
 
@@ -47,7 +46,6 @@ public class MainTeleOp extends CommandOpMode {
         manipulator = new GamepadEx(gamepad2);
 
         SRSHub.Config config = new SRSHub.Config();
-        config.setEncoder(1, SRSHub.Encoder.QUADRATURE);
         config.addI2CDevice(
                 1,
                 new SRSHub.GoBildaPinpoint(
@@ -75,69 +73,30 @@ public class MainTeleOp extends CommandOpMode {
         in = new intake(hardwareMap);
 
 
-        // --- Shooter Control ---
+        shooterSpeed = 0;
+
+        // Default Commands
+        // Intake Command
+        in.setDefaultCommand(new IntakeCommand(in, out, driver));
+
+        // Shooting
+        // Click bumper once to activate intake at full speed
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new SequentialCommandGroup(
-                        new InstantCommand(() -> {
-                            shooter.setTargetRPM(3500);
-                        }),
-                        new WaitUntilCommand(()-> {
-                            double velocity = srs.readEncoder(1).velocity;
-                            return velocity > 3400 && velocity < 3600;
-                        }),
-                        new InstantCommand(out::unblock),
-                        new WaitCommand(500),
-                        new InstantCommand(in::shoot)
-                ))
-                .whenReleased(new SequentialCommandGroup(
-                        new InstantCommand(()-> {
-                            in.stop();
-                            out.block();
-                        })
-                ));
+                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(3500)));
 
+        // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new SequentialCommandGroup(
-                        new InstantCommand(() -> {
-                            shooter.setTargetRPM(2500);
-                        }),
-                        new WaitUntilCommand(()-> {
-                            double velocity = srs.readEncoder(1).velocity;
-                            return velocity > 2500 && velocity < 2700;
-                        }),
-                        new InstantCommand(out::unblock),
-                        new WaitCommand(500),
-                        new InstantCommand(in::shoot)
-                ))
-                .whenReleased(new SequentialCommandGroup(
-                        new InstantCommand(()-> {
-                            in.stop();
-                            out.block();
-                        })
-                ));
+                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(2500)));
 
+        // Click both bumpers to turn shooter off
         Trigger shooterOff = driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .and(driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER));
-        shooterOff.whenActive(new InstantCommand(() -> {
-            shooter.setTargetRPM(0);
-            out.block();
-        }));
+        shooterOff.whenActive(new InstantCommand(() -> shooter.setTargetRPM(0)));
 
-        // --- Intake Control ---
-        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 ||
-                driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
-                .whileActiveContinuous(new InstantCommand(()-> {
-                    double leftTrigger = driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-                    double rightTrigger = manipulator.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
-
-                    out.block();
-                    in.runIntake(rightTrigger - leftTrigger);
-                    in.runTransfer(-0.2);
-                }))
-                .whenInactive(new InstantCommand(()-> {
-                    in.stop();
-                    out.block();
-                }));
+        // Transfering Command
+        // Click to toggle on and off transfering
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                        .whenPressed(new TransferCommand(in, out, driver));
 
         telemetry.addLine("ROBOT READY!");
         telemetry.update();
@@ -147,7 +106,7 @@ public class MainTeleOp extends CommandOpMode {
     public void run() {
         super.run();
         srs.update();
-        shooter.runShooter(); // shouldnt run by default
+        shooter.runShooter(); // shouldn't run by default
 
         double forward = driver.getLeftY(); // Forwards/backwards
         double right = driver.getLeftX(); // Strafe
@@ -162,8 +121,12 @@ public class MainTeleOp extends CommandOpMode {
                     resetPinpoint(pinpoint);
                 }));
 
+        out.aiming(gamepad1.dpad_up,
+                gamepad1.dpad_down);
+
         // --- Telemetry ---
-        telemetry.addData("Shooter Encoder Vel", srs.readEncoder(1).velocity);
+        telemetry.addData("Shooter Encoder Vel", shooter.getShooterVelocity());
+        telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
 
         telemetry.addData("Pinpoint X (mm)", relativePose.getX(DistanceUnit.INCH));
         telemetry.addData("Pinpoint Y (mm)", relativePose.getY(DistanceUnit.INCH));
@@ -209,7 +172,7 @@ public class MainTeleOp extends CommandOpMode {
     public Pose2D getPinpointPose(SRSHub.GoBildaPinpoint pinpoint) {
         double x = pinpoint.xPosition - xOffset;
         double y = pinpoint.yPosition - yOffset;
-        double heading = AngleUnit.normalizeRadians(pinpoint.hOrientation - headingOffset);
+        double heading = pinpoint.hOrientation -AngleUnit.normalizeRadians(headingOffset);
         return new Pose2D(DistanceUnit.MM, x, y, AngleUnit.RADIANS, heading);
     }
 }

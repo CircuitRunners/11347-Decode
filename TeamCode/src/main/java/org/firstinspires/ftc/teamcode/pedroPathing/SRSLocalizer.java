@@ -92,8 +92,8 @@ public class SRSLocalizer implements Localizer {
 
         // Convert velocities to inches/s (still robot-relative)
         velocity = new Pose(
-                DistanceUnit.MM.toInches(pinpoint.yVelocity),
                 DistanceUnit.MM.toInches(pinpoint.xVelocity),
+                -DistanceUnit.MM.toInches(pinpoint.yVelocity),
                 pinpoint.hVelocity * headingScalar
         );
     }
