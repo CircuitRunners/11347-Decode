@@ -69,8 +69,8 @@ public class SRSLocalizer implements Localizer {
     public void update() {
         hub.update();
 
-        double x = pinpoint.xPosition;
-        double y = pinpoint.yPosition;
+        double x = pinpoint.xPosition - xOffset;
+        double y = pinpoint.yPosition - yOffset;
         double rawHeading = pinpoint.hOrientation - headingOffset;
 
         if (Double.isNaN(lastRawHeading)) {
@@ -82,12 +82,13 @@ public class SRSLocalizer implements Localizer {
 
         totalHeading += delta * headingScalar;
 
+        double wrappedHeading = AngleUnit.normalizeRadians(totalHeading * turningMultiplier);
+
         // Convert mm → inches and apply tuning multipliers
         currentPose = new Pose(
                 DistanceUnit.MM.toInches(x) * forwardMultiplier,
                 DistanceUnit.MM.toInches(y) * lateralMultiplier,
-                AngleUnit.normalizeRadians(
-                        totalHeading) * turningMultiplier
+                wrappedHeading
         );
 
         // Convert velocities to inches/s (still robot-relative)

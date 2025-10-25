@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.teleOp.competition;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -14,15 +17,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.subsystems.intake;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 import org.firstinspires.ftc.teamcode.subsystems.outtake;
+import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
+@Config
 @TeleOp(group="1")
 public class MainTeleOp extends CommandOpMode {
     private StaticShooter shooter;
@@ -30,10 +36,12 @@ public class MainTeleOp extends CommandOpMode {
     private outtake out;
     private intake in;
     private SRSHub srs;
+    private LimelightSubsystem limelight;
 
     // Stuff for resetting pinpoint location
     private float xOffset = 0, yOffset = 0, headingOffset = 0;
-    private static int shooterSpeed = 0;
+    private boolean headingLockEnabled = false;
+    public static double tP = 0.02;
 
     private GamepadEx driver, manipulator;
 
@@ -71,9 +79,9 @@ public class MainTeleOp extends CommandOpMode {
         drive = new mecanumDB(hardwareMap);
         out = new outtake(hardwareMap);
         in = new intake(hardwareMap);
-
-
-        shooterSpeed = 0;
+        limelight = new LimelightSubsystem(hardwareMap, "limelight");
+        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
+        limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
 
         // Default Commands
         // Intake Command
@@ -98,7 +106,12 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
                         .whenPressed(new TransferCommand(in, out, driver));
 
+        //Heading Lock
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                        .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
+
         telemetry.addLine("ROBOT READY!");
+        telemetry.addData("Current Alliance Tag", AlliancePresets.getAllianceShooterTag());
         telemetry.update();
     }
 
@@ -107,10 +120,22 @@ public class MainTeleOp extends CommandOpMode {
         super.run();
         srs.update();
         shooter.runShooter(); // shouldn't run by default
+        limelight.update();
+
+        out.aiming(gamepad1.dpad_down, gamepad1.dpad_up);
 
         double forward = driver.getLeftY(); // Forwards/backwards
         double right = driver.getLeftX(); // Strafe
         double rotate = driver.getRightX(); // Rotation
+
+        if (headingLockEnabled && limelight.hasValidTarget()) {
+            LLResult result = limelight.getLatest();
+            if (result != null && result.isValid()) {
+                double finalRotation = result.getTxNC() * tP;
+                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
+                rotate = finalRotation;
+            }
+        }
 
         Pose2D pose = driveFieldRelative(srs, forward, right, rotate);
         SRSHub.GoBildaPinpoint pinpoint = srs.getI2CDevice(1, SRSHub.GoBildaPinpoint.class);
@@ -121,8 +146,16 @@ public class MainTeleOp extends CommandOpMode {
                     resetPinpoint(pinpoint);
                 }));
 
-        out.aiming(gamepad1.dpad_up,
-                gamepad1.dpad_down);
+        double distLOS = limelight.getDistanceToTagCenterInches(false);
+        double distGround = limelight.getDistanceToTagCenterInches(true);
+
+        // Limelight Distance Calc
+        telemetry.addData("Distance (LOS, in)", distLOS);
+        telemetry.addData("Distance (Ground, in)", distGround);
+        telemetry.addData("Tx", limelight.getTx());
+        telemetry.addData("Ty", limelight.getTy());
+
+        telemetry.addData("Heading Lock Active?", headingLockEnabled);
 
         // --- Telemetry ---
         telemetry.addData("Shooter Encoder Vel", shooter.getShooterVelocity());
@@ -172,7 +205,7 @@ public class MainTeleOp extends CommandOpMode {
     public Pose2D getPinpointPose(SRSHub.GoBildaPinpoint pinpoint) {
         double x = pinpoint.xPosition - xOffset;
         double y = pinpoint.yPosition - yOffset;
-        double heading = pinpoint.hOrientation -AngleUnit.normalizeRadians(headingOffset);
+        double heading = pinpoint.hOrientation - headingOffset;
         return new Pose2D(DistanceUnit.MM, x, y, AngleUnit.RADIANS, heading);
     }
 }

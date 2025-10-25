@@ -20,16 +20,10 @@ public class Constants {
             .mass(11.1)
             .forwardZeroPowerAcceleration(-29.64945897478038)
             .lateralZeroPowerAcceleration(-53.7580800784387)
-            .useSecondaryTranslationalPIDF(true)
-            .useSecondaryHeadingPIDF(true)
-            .useSecondaryDrivePIDF(true)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.3, 0, 0, 0))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.2, 0, 0.01, 0.015))
-            .headingPIDFCoefficients(new PIDFCoefficients(1.2, 0, 0, 0.01))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.08, 0.01))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025, 0, 0.00001, 0.6, 0.01))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02, 0, 0.000005, 0.6, 0.01))
-            ;
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.25, 0, 0.025, 0.025))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.2, 0, 0.02, 0.02))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.012, 0, 0.001, 0.6, 0.025))
+            .centripetalScaling(0.0007);
 
     public static PathConstraints pathConstraints = new PathConstraints(
             0.99,
@@ -59,7 +53,6 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
-    /// IGNORE COMMENTED
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .setLocalizer(new SRSLocalizer(

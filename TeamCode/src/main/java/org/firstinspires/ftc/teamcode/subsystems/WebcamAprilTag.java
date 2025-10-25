@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.auto.AprilTag.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -82,5 +83,26 @@ public class WebcamAprilTag extends SubsystemBase {
 
     public AprilTagDetection getTagOfinterest() {
         return tagOfInterest;
+    }
+
+    public int getDetectedCypherFromTag() {
+        int cypher = -1;
+        switch (getDetectedTag()) {
+            case 21:
+                cypher = 0;
+                break;
+
+            case 22:
+                cypher = 1;
+                break;
+
+            case 23:
+                cypher = 2;
+                break;
+        }
+
+        AlliancePresets.setCurrentCypher(cypher);
+
+        return cypher;
     }
 }
