@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleOp.competition;
 
+import static org.firstinspires.ftc.teamcode.support.Constants.pinpointXOffset;
+import static org.firstinspires.ftc.teamcode.support.Constants.pinpointYOffset;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -9,6 +12,7 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -28,6 +32,8 @@ import org.firstinspires.ftc.teamcode.support.SRSHub;
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
+import java.util.Locale;
+
 @Config
 @TeleOp(group="1")
 public class MainTeleOp extends CommandOpMode {
@@ -35,7 +41,7 @@ public class MainTeleOp extends CommandOpMode {
     private mecanumDB drive;
     private outtake out;
     private intake in;
-    private SRSHub srs;
+    private GoBildaPinpointDriver pinpoint;
     private LimelightSubsystem limelight;
 
     // Stuff for resetting pinpoint location
@@ -53,26 +59,8 @@ public class MainTeleOp extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         manipulator = new GamepadEx(gamepad2);
 
-        SRSHub.Config config = new SRSHub.Config();
-        config.addI2CDevice(
-                1,
-                new SRSHub.GoBildaPinpoint(
-                        -28.042f,
-                        -147.02f,
-                        19.89436789f,
-                        SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD,
-                        SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED
-                )
-        );
-
-        RobotLog.clearGlobalWarningMsg();
-        srs = hardwareMap.get(SRSHub.class, "srsHub");
-        srs.init(config);
-
-        while (!srs.ready()) {
-            idle();
-        }
-        srs.update();
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        configurePinpoint();
 
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
@@ -118,8 +106,7 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void run() {
         super.run();
-        srs.update();
-        shooter.runShooter(); // shouldn't run by default
+        shooter.runShooter();
         limelight.update();
 
         out.aiming(gamepad1.dpad_down, gamepad1.dpad_up);
@@ -137,57 +124,49 @@ public class MainTeleOp extends CommandOpMode {
             }
         }
 
-        Pose2D pose = driveFieldRelative(srs, forward, right, rotate);
-        SRSHub.GoBildaPinpoint pinpoint = srs.getI2CDevice(1, SRSHub.GoBildaPinpoint.class);
-        Pose2D relativePose = getPinpointPose(pinpoint);
+        Pose2D pose;
+        pose = driveFieldRelative(forward, right, rotate);
+
+        String data = String.format(Locale.US,
+                "{X: %.3f, Y: %.3f, H: %.3f}",
+                pose.getX(DistanceUnit.INCH),
+                pose.getY(DistanceUnit.INCH),
+                pose.getHeading(AngleUnit.DEGREES)
+        );
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
                 .whenPressed(new InstantCommand(()-> {
-                    resetPinpoint(pinpoint);
+                    pinpoint.recalibrateIMU();
                 }));
 
         double distLOS = limelight.getDistanceToTagCenterInches(false);
         double distGround = limelight.getDistanceToTagCenterInches(true);
 
+
+        // --- Telemetry ---
         // Limelight Distance Calc
         telemetry.addData("Distance (LOS, in)", distLOS);
         telemetry.addData("Distance (Ground, in)", distGround);
         telemetry.addData("Tx", limelight.getTx());
         telemetry.addData("Ty", limelight.getTy());
-
         telemetry.addData("Heading Lock Active?", headingLockEnabled);
-
-        // --- Telemetry ---
         telemetry.addData("Shooter Encoder Vel", shooter.getShooterVelocity());
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
-
-        telemetry.addData("Pinpoint X (mm)", relativePose.getX(DistanceUnit.INCH));
-        telemetry.addData("Pinpoint Y (mm)", relativePose.getY(DistanceUnit.INCH));
-        telemetry.addData("Heading (deg)", Math.toDegrees(relativePose.getHeading(AngleUnit.RADIANS)));
-
-        telemetry.addData("X Vel (mm/s)", pinpoint.xVelocity);
-        telemetry.addData("Y Vel (mm/s)", pinpoint.yVelocity);
-        telemetry.addData("H Vel (rad/s)", pinpoint.hVelocity);
+        telemetry.addData("Position", data);
+        telemetry.addData("Status", pinpoint.getDeviceStatus());
+        telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
         telemetry.update();
     }
 
-    private Pose2D driveFieldRelative(SRSHub hub, double forward, double right, double rotate) {
-        // Update all SRS-connected devices
-        hub.update();
+    private Pose2D driveFieldRelative(double forward, double right, double rotate) {
+        pinpoint.update();
+        Pose2D pos = pinpoint.getPosition();  // Current position
 
-        SRSHub.GoBildaPinpoint pinpoint = hub.getI2CDevice(1, SRSHub.GoBildaPinpoint.class);
-
-        // Get live pose data
-        double x = pinpoint.xPosition;
-        double y = pinpoint.yPosition;
-        double heading = pinpoint.hOrientation; // radians
-
-        Pose2D pos = new Pose2D(DistanceUnit.MM, x, y, AngleUnit.RADIANS, heading);
-
-        // Field-centric transform
+        double robotAngle = Math.toRadians(pos.getHeading(AngleUnit.DEGREES));
         double theta = Math.atan2(forward, right);
         double r = Math.hypot(forward, right);
-        theta = AngleUnit.normalizeRadians(theta - heading);
+        theta = org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+                .normalizeRadians(theta - robotAngle);
 
         double newForward = r * Math.sin(theta);
         double newRight   = r * Math.cos(theta);
@@ -196,16 +175,14 @@ public class MainTeleOp extends CommandOpMode {
         return pos;
     }
 
-    public void resetPinpoint(SRSHub.GoBildaPinpoint pinpoint) {
-        xOffset = pinpoint.xPosition;
-        yOffset = pinpoint.yPosition;
-        headingOffset = pinpoint.hOrientation;
-    }
+    private void configurePinpoint() {
+        pinpoint.resetPosAndIMU();
 
-    public Pose2D getPinpointPose(SRSHub.GoBildaPinpoint pinpoint) {
-        double x = pinpoint.xPosition - xOffset;
-        double y = pinpoint.yPosition - yOffset;
-        double heading = pinpoint.hOrientation - headingOffset;
-        return new Pose2D(DistanceUnit.MM, x, y, AngleUnit.RADIANS, heading);
+        pinpoint.setOffsets(-28.042, -147.012, DistanceUnit.INCH);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD
+        );
     }
 }
