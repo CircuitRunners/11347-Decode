@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.test;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.intake;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 import org.firstinspires.ftc.teamcode.subsystems.outtake;
 
+@Disabled
 @TeleOp
 public class TestingTeleOp extends CommandOpMode {
     private StaticShooter shooter;

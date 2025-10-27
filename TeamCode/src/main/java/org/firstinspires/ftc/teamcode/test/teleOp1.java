@@ -10,10 +10,12 @@ servo = bumper
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 
+@Disabled
 @Config
 @TeleOp
 public class teleOp1 extends CommandOpMode {

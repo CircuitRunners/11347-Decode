@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.intake;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -21,6 +22,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 
 @Config
+@Disabled
 @TeleOp
 public class OutreachTeleop extends CommandOpMode {
     public mecanumDB drivebase;

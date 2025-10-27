@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * SRSBuilder - Fluent builder utility for constructing and initializing SRSHub configurations.
  * Makes it easy to add encoders, I2C devices, and analog/digital inputs without manual Config wiring.
  */
+@Deprecated
 public class SRSBuilder {
 
     private final SRSHub.Config config;

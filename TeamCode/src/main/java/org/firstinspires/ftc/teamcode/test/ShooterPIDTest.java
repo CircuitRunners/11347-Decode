@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,8 +17,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  * Only add kI if you see steady-state error that kF+kP can’t fix, prob won't be needed
  * Add kD to damp oscillations during spin-up, might not be needed
  */
-@TeleOp
+@Disabled
 @Config
+@TeleOp
 public class ShooterPIDTest extends CommandOpMode {
     private DcMotorEx shooter;
     public GamepadEx driver;

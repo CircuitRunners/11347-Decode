@@ -57,7 +57,8 @@ public class outtake extends SubsystemBase {
 
         blockingServoLeft.setPosition(BlockState.BLOCK.getLeft());
         blockingServoRight.setPosition(BlockState.BLOCK.getRight());
-        aimingServo.setPosition(AimState.AIM_MIN.getPosition());
+//        aimingServo.setPosition(AimState.AIM_MIN.getPosition());
+        aimingServo.setPosition(0.4);
 
         block = new RunAction(this::block);
         unblock = new RunAction(this::unblock);
@@ -96,6 +97,10 @@ public class outtake extends SubsystemBase {
 
     public void aimMax() {
         aimingServo.setPosition(AimState.AIM_MAX.getPosition());
+    }
+
+    public void aimScoring() {
+        aimingServo.setPosition(0.4);
     }
 
     public void aiming(boolean up, boolean down) {

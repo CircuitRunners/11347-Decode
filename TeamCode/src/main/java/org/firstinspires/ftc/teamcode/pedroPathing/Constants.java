@@ -55,24 +55,22 @@ public class Constants {
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                .setLocalizer(new SRSLocalizer(
-                        hardwareMap,
-                        1,
-                        -28.042f,
-                        -147.012f,
-                        19.89436789f,
-                        SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD,
-                        SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED,
-                        0
-                ))
+                .pinpointLocalizer(localizerConstants)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
 
-//    public static Follower createFollower(HardwareMap hardwareMap) {
-//        return new FollowerBuilder(followerConstants, hardwareMap)
-//                .pinpointLocalizer(localizerConstants)
+//    public static SRSConstants localizerConstants = new SRSConstants()
+//            .forwardPodY(-28.042f)
+//            .strafePodX(-147.012f)
+//            .encoderResolution(19.89436789f)
+//            .forwardEncoderDirection(SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD)
+//            .strafeEncoderDirection(SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED);
+//
+//    public static SRSFollower createFollower(HardwareMap hardwareMap) {
+//        return new SRSFollowerBuilder(followerConstants, hardwareMap)
+//                .srsLocalizer(localizerConstants)
 //                .pathConstraints(pathConstraints)
 //                .mecanumDrivetrain(driveConstants)
 //                .build();

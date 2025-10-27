@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.support.SRSHub;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 
 @Deprecated
+@Disabled
 @TeleOp(name="SRS Pinpoint teleOp", group="1")
 public class SRSPinpointTeleOp extends CommandOpMode {
     private SRSHub srs;

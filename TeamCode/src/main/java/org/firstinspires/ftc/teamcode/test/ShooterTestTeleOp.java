@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
  *  - D-Pad Up: Increase target RPM (+100)
  *  - D-Pad Down: Decrease target RPM (−100)
  */
+@Disabled
 @TeleOp(name = "Shooter Command TeleOp", group = "2")
 public class ShooterTestTeleOp extends CommandOpMode {
 
