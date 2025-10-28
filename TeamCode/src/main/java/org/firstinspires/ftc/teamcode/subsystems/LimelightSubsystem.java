@@ -24,6 +24,10 @@ public class LimelightSubsystem extends SubsystemBase {
         this.allianceTagID = allianceTagID;
     }
 
+    public int getLimelightAllianceTagID() {
+        return allianceTagID;
+    }
+
     public void update() {
         latestResult = limelight.getLatestResult();
     }

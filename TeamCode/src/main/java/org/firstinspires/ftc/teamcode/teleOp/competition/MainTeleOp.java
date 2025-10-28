@@ -1,21 +1,16 @@
 package org.firstinspires.ftc.teamcode.teleOp.competition;
 
-import static org.firstinspires.ftc.teamcode.support.Constants.pinpointXOffset;
-import static org.firstinspires.ftc.teamcode.support.Constants.pinpointYOffset;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -27,7 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.intake;
 import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
 import org.firstinspires.ftc.teamcode.subsystems.outtake;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
-import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
@@ -37,6 +31,7 @@ import java.util.Locale;
 @Config
 @TeleOp(group="1")
 public class MainTeleOp extends CommandOpMode {
+    // HARDWARE
     private StaticShooter shooter;
     private mecanumDB drive;
     private outtake out;
@@ -44,11 +39,11 @@ public class MainTeleOp extends CommandOpMode {
     private GoBildaPinpointDriver pinpoint;
     private LimelightSubsystem limelight;
 
-    // Stuff for resetting pinpoint location
-    private float xOffset = 0, yOffset = 0, headingOffset = 0;
+    // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
     public static double tP = 0.02;
 
+    // CONTROLLERS
     private GamepadEx driver, manipulator;
 
     @Override
@@ -68,7 +63,6 @@ public class MainTeleOp extends CommandOpMode {
         out = new outtake(hardwareMap);
         in = new intake(hardwareMap);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
-        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
 
         // Default Commands
@@ -99,7 +93,7 @@ public class MainTeleOp extends CommandOpMode {
                         .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
 
         telemetry.addLine("ROBOT READY!");
-        telemetry.addData("Current Alliance Tag", AlliancePresets.getAllianceShooterTag());
+        telemetry.addData("Current Alliance Tag", limelight.getLimelightAllianceTagID());
         telemetry.update();
     }
 
