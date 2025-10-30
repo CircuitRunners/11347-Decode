@@ -7,17 +7,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
-import org.firstinspires.ftc.teamcode.subsystems.intake;
-import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
-import org.firstinspires.ftc.teamcode.subsystems.outtake;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 
 @Disabled
 @TeleOp
 public class TestingTeleOp extends CommandOpMode {
     private StaticShooter shooter;
-    private mecanumDB db;
-    private outtake out;
-    private intake in;
+    private MecanumDrivebase db;
+    private OuttakeSubsystem out;
+    private IntakeSubsystem in;
 
     private boolean activeFast = false;
     private boolean activeSlow = false;
@@ -27,9 +27,9 @@ public class TestingTeleOp extends CommandOpMode {
     @Override
     public void initialize() {
         shooter = new StaticShooter(hardwareMap, telemetry);
-        db = new mecanumDB(hardwareMap);
-        out = new outtake(hardwareMap);
-        in = new intake(hardwareMap);
+        db = new MecanumDrivebase(hardwareMap);
+        out = new OuttakeSubsystem(hardwareMap);
+        in = new IntakeSubsystem(hardwareMap);
 
         driver = new GamepadEx(gamepad1);
 
@@ -42,7 +42,7 @@ public class TestingTeleOp extends CommandOpMode {
         super.run();
 
         shooter.applyPIDF();
-        shooter.runShooter();
+        shooter.update();
 
         double forward = driver.getRightY();
         double strafe = driver.getRightX();

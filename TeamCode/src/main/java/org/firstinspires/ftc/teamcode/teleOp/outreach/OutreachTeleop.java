@@ -8,8 +8,8 @@ servo = bumper
 ... no
 */
 
-import org.firstinspires.ftc.teamcode.subsystems.outtake;
-import org.firstinspires.ftc.teamcode.subsystems.intake;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -19,17 +19,17 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
 
 @Config
 @Disabled
 @TeleOp
 public class OutreachTeleop extends CommandOpMode {
-    public mecanumDB drivebase;
+    public MecanumDrivebase drivebase;
     GamepadEx driver;
     GamepadEx manipulator;
-    private outtake outtake;
-    private intake intake;
+    private OuttakeSubsystem outtake;
+    private IntakeSubsystem intake;
     private double outtakeMotor = 0;
     private double transferMotor = 0;
     private double intakeMotor = 0;
@@ -39,11 +39,11 @@ public class OutreachTeleop extends CommandOpMode {
 
     @Override
     public void initialize() {
-        drivebase = new mecanumDB(hardwareMap);
+        drivebase = new MecanumDrivebase(hardwareMap);
         driver = new GamepadEx(gamepad1);
         manipulator = new GamepadEx(gamepad2);
-        outtake = new outtake(hardwareMap);
-        intake = new intake(hardwareMap);
+        outtake = new OuttakeSubsystem(hardwareMap);
+        intake = new IntakeSubsystem(hardwareMap);
 
 
 

@@ -16,11 +16,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
+import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
-import org.firstinspires.ftc.teamcode.subsystems.intake;
-import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
-import org.firstinspires.ftc.teamcode.subsystems.outtake;
+import org.firstinspires.ftc.teamcode.subsystems.GobildaRGBIndicatorHelper;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
@@ -33,11 +35,13 @@ import java.util.Locale;
 public class MainTeleOp extends CommandOpMode {
     // HARDWARE
     private StaticShooter shooter;
-    private mecanumDB drive;
-    private outtake out;
-    private intake in;
+    private MecanumDrivebase drive;
+    private OuttakeSubsystem out;
+    private IntakeSubsystem in;
     private GoBildaPinpointDriver pinpoint;
     private LimelightSubsystem limelight;
+    private GobildaRGBIndicatorHelper rgbHelper;
+    private BeamBreakHelper beamBreak;
 
     // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
@@ -49,7 +53,6 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void initialize() {
         schedule(new BulkCacheCommand(hardwareMap));
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         driver = new GamepadEx(gamepad1);
         manipulator = new GamepadEx(gamepad2);
@@ -59,11 +62,13 @@ public class MainTeleOp extends CommandOpMode {
 
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
-        drive = new mecanumDB(hardwareMap);
-        out = new outtake(hardwareMap);
-        in = new intake(hardwareMap);
+        drive = new MecanumDrivebase(hardwareMap);
+        out = new OuttakeSubsystem(hardwareMap);
+        in = new IntakeSubsystem(hardwareMap);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
+        rgbHelper = new GobildaRGBIndicatorHelper(hardwareMap);
+        beamBreak = new BeamBreakHelper(hardwareMap);
 
         // Default Commands
         // Intake Command
@@ -103,8 +108,9 @@ public class MainTeleOp extends CommandOpMode {
     @Override
     public void run() {
         super.run();
-        shooter.runShooter();
+        shooter.update();
         limelight.update();
+        beamBreak.update();
 
         out.aiming(gamepad1.dpad_down, gamepad1.dpad_up);
 
@@ -123,6 +129,14 @@ public class MainTeleOp extends CommandOpMode {
 
         Pose2D pose;
         pose = driveFieldRelative(forward, right, rotate);
+
+        if (shooter.isAtTargetThreshold()) {
+            rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.BLUE);
+        } else if (beamBreak.isBeamStable()) {
+            rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.GREEN);
+        } else {
+            rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.RED);
+        }
 
         String data = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
@@ -149,13 +163,20 @@ public class MainTeleOp extends CommandOpMode {
 
         // --- Telemetry ---
         // Limelight Distance Calc
+        telemetry.addLine("----  Limelight Data  ----");
         telemetry.addData("Distance (LOS, in)", distLOS);
         telemetry.addData("Distance (Ground, in)", distGround);
         telemetry.addData("Tx", limelight.getTx());
         telemetry.addData("Ty", limelight.getTy());
+        telemetry.addLine();
+        telemetry.addLine("----  Subsystems Data  ----");
         telemetry.addData("Heading Lock Active?", headingLockEnabled);
-        telemetry.addData("Shooter Encoder Vel", shooter.getShooterVelocity());
+        telemetry.addData("Shooter Encoder Velo", shooter.getShooterVelocity());
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
+        telemetry.addData("Beam Break State: ", beamBreak.getBeamState());
+        telemetry.addData("RGB Colour", rgbHelper.getCurrentColour());
+        telemetry.addLine();
+        telemetry.addLine("----  Pinpoint Data  ----");
         telemetry.addData("Position", data);
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
@@ -182,7 +203,7 @@ public class MainTeleOp extends CommandOpMode {
     private void configurePinpoint() {
         pinpoint.resetPosAndIMU();
 
-        pinpoint.setOffsets(-28.042, -147.012, DistanceUnit.INCH);
+        pinpoint.setOffsets(-28.042, -147.012, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,

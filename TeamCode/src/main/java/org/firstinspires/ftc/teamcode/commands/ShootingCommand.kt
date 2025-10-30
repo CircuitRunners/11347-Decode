@@ -6,8 +6,8 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup
 import com.arcrobotics.ftclib.command.WaitCommand
 import com.arcrobotics.ftclib.command.WaitUntilCommand
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter
-import org.firstinspires.ftc.teamcode.subsystems.intake
-import org.firstinspires.ftc.teamcode.subsystems.outtake
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 
 /**
  * ShootCommand spins up the flywheel, waits for target RPM,
@@ -15,14 +15,14 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake
  */
 class ShootingCommand(
     private val shooter: StaticShooter,
-    private val out: outtake,
-    private val inSubsystem: intake,
+    private val out: OuttakeSubsystem,
+    private val inSubsystem: IntakeSubsystem,
     private val targetRPM: Double,
     private val lowerBound: Double = targetRPM - 100,
     private val upperBound: Double = targetRPM + 100
 ) : ParallelRaceGroup() {
 
-    constructor(shooter: StaticShooter, out: outtake, inSubsystem: intake, targetRPM: Double)
+    constructor(shooter: StaticShooter, out: OuttakeSubsystem, inSubsystem: IntakeSubsystem, targetRPM: Double)
             : this(shooter, out, inSubsystem, targetRPM, targetRPM - 100, targetRPM + 100)
 
     init {

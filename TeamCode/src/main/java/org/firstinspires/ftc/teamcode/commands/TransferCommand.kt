@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.commands
 import com.arcrobotics.ftclib.command.CommandBase
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
-import org.firstinspires.ftc.teamcode.subsystems.intake
-import org.firstinspires.ftc.teamcode.subsystems.outtake
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 
 class TransferCommand(
-    private var inSubsystem: intake,
-    private var out: outtake,
+    private var inSubsystem: IntakeSubsystem,
+    private var out: OuttakeSubsystem,
     private var driver: GamepadEx
 ) : CommandBase() {
     private var blocking = true;

@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.support.RunAction;
 
-public class outtake extends SubsystemBase {
+public class OuttakeSubsystem extends SubsystemBase {
     // === Enums ===
     public enum BlockState {
         BLOCK(0.5, 0.5),
@@ -48,7 +46,7 @@ public class outtake extends SubsystemBase {
     public Servo blockingServoLeft, blockingServoRight;
     public Servo aimingServo;
 
-    public outtake(HardwareMap hardwareMap) {
+    public OuttakeSubsystem(HardwareMap hardwareMap) {
         blockingServoLeft = hardwareMap.get(Servo.class, "blockingLeft");
         blockingServoRight = hardwareMap.get(Servo.class, "blockingRight");
         aimingServo = hardwareMap.get(Servo.class, "aimServo");

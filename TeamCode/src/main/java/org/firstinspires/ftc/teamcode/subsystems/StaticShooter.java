@@ -28,6 +28,7 @@ public class StaticShooter extends SubsystemBase {
     private static double MOTOR_RPM = 1620.0;          // motor RPM (based on max motor rpm)
     private static double GEAR_RATIO = 2.5;            // gear ratio from motor to shooter
     private static double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
+    private boolean active;
 
     // --- PIDF Coefficients ---
     //working value 35 on October 9th, 2025
@@ -74,6 +75,7 @@ public class StaticShooter extends SubsystemBase {
         setMotorRPM(defaultMotorRPM);
         setGearRatio(defaultGearRatio);
         setTicksPerRev(defaultTicks);
+        active = Math.abs(getTargetRPM()) > 0;
 
         // Apply initial PIDF coefficients
         applyPIDF();
@@ -120,6 +122,15 @@ public class StaticShooter extends SubsystemBase {
     }
 
     /**
+     * Returns the target RPM of the shooter, used to check if velo
+     * is within tolerance
+     * @return returns the target RPM of the shooter
+     */
+    public double getTargetRPM() {
+        return TARGET_RPM;
+    }
+
+    /**
      * Changes the RPM of the motor
      * @param motorRPM Set to the RPM of the motor
      *
@@ -140,6 +151,10 @@ public class StaticShooter extends SubsystemBase {
         GEAR_RATIO = gearRatio;
     }
 
+    /**
+     * Returns the current gear ratio of the shooter
+     * @return returns the current GEAR_RATIO of the shooter system
+     */
     public double getGearRatio() {
         return GEAR_RATIO;
     }
@@ -154,6 +169,10 @@ public class StaticShooter extends SubsystemBase {
         TICKS_PER_REV = TicksPerRev;
     }
 
+    /**
+     * Returns the current Ticks Per Rev of the shooter
+     * @return returns the TICKS_PER_REV of the shooter flywheel
+     */
     public double getTicksPerRev() {
         return TICKS_PER_REV;
     }
@@ -162,9 +181,11 @@ public class StaticShooter extends SubsystemBase {
      * Calculates ticks per second based on target RPM
      * Sets the target velocity
      * */
-    public void runShooter() {
+    public void update() {
         double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
         shooter.setVelocity(targetTicksPerSec);
+
+        active = Math.abs(getTargetRPM()) > 0;
     }
 
     /** Stops all shooter motion immediately. */
@@ -192,5 +213,13 @@ public class StaticShooter extends SubsystemBase {
      */
     public double getMotorVoltage() {
         return shooter.getCurrent(CurrentUnit.AMPS);
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public boolean isAtTargetThreshold() {
+        return ((getShooterVelocity() > (getTargetRPM() - 100)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
     }
 }

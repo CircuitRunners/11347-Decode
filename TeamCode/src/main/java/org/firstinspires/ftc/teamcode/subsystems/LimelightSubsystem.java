@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class LimelightSubsystem extends SubsystemBase {
     private final Limelight3A limelight;
-    private int allianceTagID;
+    private int allianceTagID = 20; // defaults to blue
     private LLResult latestResult = null;
 
     public LimelightSubsystem(HardwareMap hardwareMap, String deviceName) {

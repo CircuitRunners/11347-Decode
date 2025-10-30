@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.commands
 
 import com.arcrobotics.ftclib.command.CommandBase
-import org.firstinspires.ftc.teamcode.subsystems.intake
-import org.firstinspires.ftc.teamcode.subsystems.outtake
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 
 class IntakeCommand(
-    private val inSubsystem: intake,
-    private val out: outtake,
+    private val inSubsystem: IntakeSubsystem,
+    private val out: OuttakeSubsystem,
     private val driver: GamepadEx
 ) : CommandBase() {
 

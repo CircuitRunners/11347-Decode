@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto.AutoPaths;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -12,7 +8,6 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -20,10 +15,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
-import org.firstinspires.ftc.teamcode.subsystems.intake;
-import org.firstinspires.ftc.teamcode.subsystems.outtake;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
-import org.firstinspires.ftc.teamcode.support.RunAction;
 
 import java.util.List;
 
@@ -36,8 +30,8 @@ public class GPPAuto extends OpMode {
     private int pathState = 0;
 
     private StaticShooter shooter;
-    private intake in;
-    private outtake out;
+    private IntakeSubsystem in;
+    private OuttakeSubsystem out;
     private LimelightSubsystem limelight;
 
     private boolean intaking, transfering, scoring, moving;
@@ -149,8 +143,8 @@ public class GPPAuto extends OpMode {
 
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
-        out = new outtake(hardwareMap);
-        in = new intake(hardwareMap);
+        out = new OuttakeSubsystem(hardwareMap);
+        in = new IntakeSubsystem(hardwareMap);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
@@ -186,7 +180,7 @@ public class GPPAuto extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        shooter.runShooter();
+        shooter.update();
         limelight.update();
         autonomousPathUpdate();
 

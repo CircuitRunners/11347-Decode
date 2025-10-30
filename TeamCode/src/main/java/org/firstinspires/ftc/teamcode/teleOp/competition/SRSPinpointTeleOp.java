@@ -13,14 +13,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
 import org.firstinspires.ftc.teamcode.support.SRSHub;
-import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
 
 @Deprecated
 @Disabled
 @TeleOp(name="SRS Pinpoint teleOp", group="1")
 public class SRSPinpointTeleOp extends CommandOpMode {
     private SRSHub srs;
-    private mecanumDB drive;
+    private MecanumDrivebase drive;
 
     private GamepadEx driver, manipulator;
 
@@ -37,7 +37,7 @@ public class SRSPinpointTeleOp extends CommandOpMode {
 
         driver = new GamepadEx(gamepad1);
         manipulator = new GamepadEx(gamepad2);
-        drive = new mecanumDB(hardwareMap);
+        drive = new MecanumDrivebase(hardwareMap);
 
         // --- Configure SRS Hub ---
         SRSHub.Config config = new SRSHub.Config();

@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
-public class intake extends SubsystemBase {
+public class IntakeSubsystem extends SubsystemBase {
+
     public DcMotorEx intakeRoller;
     public DcMotorEx transferMech;
     public static boolean intake = true;
     public static boolean transfer = true;
 
-    public intake(HardwareMap hardwareMap) {
+    public IntakeSubsystem(HardwareMap hardwareMap) {
         intakeRoller = hardwareMap.get(DcMotorEx.class, "intake");
         transferMech = hardwareMap.get(DcMotorEx.class, "transfer");
     }

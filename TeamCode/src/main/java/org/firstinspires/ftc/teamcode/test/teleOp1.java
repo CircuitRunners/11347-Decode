@@ -13,18 +13,18 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.mecanumDB;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
 
 @Disabled
 @Config
 @TeleOp
 public class teleOp1 extends CommandOpMode {
-    public mecanumDB drivebase;
+    public MecanumDrivebase drivebase;
     public static double power = 1;
 
     @Override
     public void initialize() {
-        drivebase = new mecanumDB(hardwareMap);
+        drivebase = new MecanumDrivebase(hardwareMap);
     }
 
     @Override
