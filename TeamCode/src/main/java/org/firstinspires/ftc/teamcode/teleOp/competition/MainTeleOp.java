@@ -76,7 +76,10 @@ public class MainTeleOp extends CommandOpMode {
 
         // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(2500)));
+                .whenPressed(new InstantCommand(()-> {
+                    shooter.setTargetRPM(2500);
+                    out.aimMin();
+                }));
 
         // Click both bumpers to turn shooter off
         Trigger shooterOff = driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
@@ -132,6 +135,13 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(()-> {
                     pinpoint.recalibrateIMU();
                 }));
+
+        if (out.getAimPos() > 0.48) {
+            out.setAim(0.48);
+        }
+        if (out.getAimPos() < 0) {
+            out.setAim(0);
+        }
 
         double distLOS = limelight.getDistanceToTagCenterInches(false);
         double distGround = limelight.getDistanceToTagCenterInches(true);
