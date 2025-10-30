@@ -28,7 +28,7 @@ public class GPPAuto extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
-    private int count = 0;
+    Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
@@ -66,7 +66,7 @@ public class GPPAuto extends OpMode {
                 .build();
 
         line3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(41.000, 35.500), new Pose(26.000, 35.500)))
+                .addPath(new BezierLine(new Pose(41.000, 35.500), new Pose(9.000, 35.500)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
 
@@ -173,6 +173,7 @@ public class GPPAuto extends OpMode {
 
     @Override
     public void start() {
+
         pathTimer.resetTimer();
         setPathState(-2);
     }
@@ -226,32 +227,33 @@ public class GPPAuto extends OpMode {
             case 0:
                 if (!follower.isBusy()) {
                     follower.followPath(line1);
+                    shootTime.resetTimer();
                     setPathState(-1);
                 }
                 break;
 
             case -1:
-                Timer shootTime = new Timer();
 
-                if (shootTime.getElapsedTimeSeconds() < 10) {
+
+                if (shootTime.getElapsedTimeSeconds() < 15) {
                     if (shooter.getShooterVelocity() >= 3250 && shooter.getShooterVelocity() < 3450) {
                         transfer();
-                        count++;
+
                     } else if (shooter.getShooterVelocity() < 3250) {
                         stopTransfer();
-                        if(count > 3){
-                            setPathState(1);
-                        }
+
                     }
                 } else {
                     stopTransfer();
-//                    setPathState(1);
+                    shooter.setTargetRPM(0);
+                    setPathState(1);
                 }
 
                 break;
 
             case 1:
                 if (!follower.isBusy()) {
+                    in.runIntake(1);
                     follower.followPath(line2);
                     setPathState(2);
                 }

@@ -28,7 +28,7 @@ public class RedSideAuto extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
-
+    Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
@@ -66,7 +66,7 @@ public class RedSideAuto extends OpMode {
 
         line3 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(103.000, 35.500), new Pose(120.000, 35.500))
+                        new BezierLine(new Pose(103.000, 35.500), new Pose(136.000, 35.500))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -244,8 +244,8 @@ public class RedSideAuto extends OpMode {
                 break;
 
             case -1:
-                Timer shootTime = new Timer();
-                if (shootTime.getElapsedTimeSeconds() < 10) {
+                shootTime.resetTimer();
+                if (shootTime.getElapsedTimeSeconds() < 15) {
                     if (shooter.getShooterVelocity() > 3300 && shooter.getShooterVelocity() < 3500) {
                         transfer();
                     } else if (shooter.getShooterVelocity() < 3290) {
@@ -253,14 +253,19 @@ public class RedSideAuto extends OpMode {
                     }
                 } else {
                     stopTransfer();
-//                    setPathState(1);
+                    shooter.setTargetRPM(0);
+                    setPathState(1);
                 }
                 break;
 
             case 1:
                 if (!follower.isBusy()) {
-                    follower.followPath(line2);
-                    setPathState(2);
+                    shootTime.resetTimer();
+
+                    if (shootTime.getElapsedTimeSeconds() > 1.5) {
+                        follower.followPath(line2);
+                        setPathState(2);
+                    }
                 }
                 break;
 
