@@ -28,7 +28,7 @@ public class GPPAuto extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
-
+    private int count = 0;
     private StaticShooter shooter;
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
@@ -232,16 +232,22 @@ public class GPPAuto extends OpMode {
 
             case -1:
                 Timer shootTime = new Timer();
+
                 if (shootTime.getElapsedTimeSeconds() < 10) {
-                    if (shooter.getShooterVelocity() > 3300 && shooter.getShooterVelocity() < 3500) {
+                    if (shooter.getShooterVelocity() >= 3250 && shooter.getShooterVelocity() < 3450) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3290) {
+                        count++;
+                    } else if (shooter.getShooterVelocity() < 3250) {
                         stopTransfer();
+                        if(count > 3){
+                            setPathState(1);
+                        }
                     }
                 } else {
                     stopTransfer();
 //                    setPathState(1);
                 }
+
                 break;
 
             case 1:
@@ -254,7 +260,7 @@ public class GPPAuto extends OpMode {
             case 2:
                 if (!follower.isBusy()) {
                     follower.followPath(line3);
-                    setPathState(3);
+                    //setPathState(3);
                 }
                 break;
 

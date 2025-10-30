@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BeamBreakHelper extends SubsystemBase {
     private DigitalChannel intakeBeamBreak;
     private ElapsedTime beamTimer = new ElapsedTime();
-    private static final double BEAM_HOLD_TIME = 0.4;
+    private static final double BEAM_HOLD_TIME = 0.35;
     private boolean isBeamStable = false;
 
     /**

@@ -77,7 +77,8 @@ public class MainTeleOp extends CommandOpMode {
         // Shooting
         // Click bumper once to activate intake at full speed
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(3500)));
+                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(3200)));
+        out.aimMax();
 
         // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
