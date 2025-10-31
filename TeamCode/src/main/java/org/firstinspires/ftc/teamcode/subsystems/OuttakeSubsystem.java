@@ -47,7 +47,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public Servo aimingServo;
 
     public OuttakeSubsystem(HardwareMap hardwareMap) {
-        blockingServoLeft = hardwareMap.get(Servo.class, "blockingLeft");
+        blockingServoLeft = hardwareMap.get(Sxrvo.class, "blockingLeft");
         blockingServoRight = hardwareMap.get(Servo.class, "blockingRight");
         aimingServo = hardwareMap.get(Servo.class, "aimServo");
         aimingServo.setDirection(Servo.Direction.REVERSE);
