@@ -23,7 +23,7 @@ import java.util.List;
 
 @Config
 @Configurable
-@Autonomous(name="Red Side Auto", group="Red Autos")
+@Autonomous(name="Red Side Auto", group="Red Autos", preselectTeleOp="MainTeleOp")
 public class RedSideAutoFar extends OpMode {
     private Follower follower;
     private Timer pathTimer;
