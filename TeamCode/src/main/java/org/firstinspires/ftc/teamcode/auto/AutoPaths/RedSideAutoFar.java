@@ -74,7 +74,7 @@ public class RedSideAutoFar extends OpMode {
         line4 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(120.000, 35.500),
+                                new Pose(136.000, 35.500),
                                 new Pose(94.000, 48.000),
                                 new Pose(90.500, 90.000)
                         )
