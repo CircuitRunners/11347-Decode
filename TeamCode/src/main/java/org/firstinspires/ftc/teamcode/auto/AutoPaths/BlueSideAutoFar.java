@@ -257,7 +257,7 @@ public class BlueSideAutoFar extends OpMode {
                     in.runIntake(1);
                     shooter.setTargetRPM(3500);
                     follower.followPath(line2);
-                    setPathState(2);
+                    setPathState(67);
                 }
                 break;
             case 67: //u can change this number ureself, i dont want to change all of the following numbers
@@ -272,14 +272,16 @@ public class BlueSideAutoFar extends OpMode {
                 } else {
                     stopTransfer();
                     out.block();
-                    shooter.setTargetRPM(0);
+                    shooter.setTargetRPM(2000);
                     setPathState(2);
                 }
 
                 break;
             case 2:
                 if (!follower.isBusy()) {
-                    follower.followPath(line3);
+                    in.runIntake(1);
+                    follower.followPath(line2);
+                    shooter.setTargetRPM(3500);
                     //setPathState(3);
                 }
                 break;
