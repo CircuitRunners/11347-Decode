@@ -98,7 +98,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void aimScoring() {
-        aimingServo.setPosition(0.3);
+        aimingServo.setPosition(0.17);
     }
 
     public void setAim(double position) {
