@@ -42,6 +42,7 @@ public class MainTeleOp extends CommandOpMode {
     private LimelightSubsystem limelight;
     private GobildaRGBIndicatorHelper rgbHelper;
     private BeamBreakHelper beamBreak;
+    private boolean aimServoLimit = true;
 
     // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
@@ -85,6 +86,16 @@ public class MainTeleOp extends CommandOpMode {
                 .whenPressed(new InstantCommand(()-> {
                     shooter.setTargetRPM(2500);
                     out.aimMin();
+                }));
+
+        manipulator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(()-> {
+                    aimServoLimit = false;
+                }));
+
+        manipulator.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(new InstantCommand(()-> {
+                    aimServoLimit = true;
                 }));
 
         // Click both bumpers to turn shooter off
@@ -151,11 +162,13 @@ public class MainTeleOp extends CommandOpMode {
                     pinpoint.recalibrateIMU();
                 }));
 
-        if (out.getAimPos() > 0.48) {
-            out.setAim(0.48);
-        }
-        if (out.getAimPos() < 0) {
-            out.setAim(0);
+        if (aimServoLimit) {
+            if (out.getAimPos() > 0.48) {
+                out.setAim(0.48);
+            }
+            if (out.getAimPos() < 0) {
+                out.setAim(0);
+            }
         }
 
         double distLOS = limelight.getDistanceToTagCenterInches(false);

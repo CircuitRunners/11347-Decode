@@ -253,6 +253,7 @@ public class RedSideAuto extends OpMode {
                     }
                 } else {
                     stopTransfer();
+                    out.block();
                     shooter.setTargetRPM(0);
                     setPathState(1);
                 }
