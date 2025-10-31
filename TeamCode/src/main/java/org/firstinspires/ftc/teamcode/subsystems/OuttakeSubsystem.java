@@ -108,14 +108,10 @@ public class OuttakeSubsystem extends SubsystemBase {
     public void aiming(boolean up, boolean down) {
         double currentPos = aimingServo.getPosition();
 
-
-
         if (up) {
             aimingServo.setPosition(Range.clip(currentPos-0.005, 0, 04.5));
         } else if (down) {
             aimingServo.setPosition(Range.clip(currentPos+0.005, 0, 04.5));
         }
-
-
     }
 }

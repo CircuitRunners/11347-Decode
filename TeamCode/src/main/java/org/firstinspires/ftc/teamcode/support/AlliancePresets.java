@@ -31,7 +31,7 @@ public class AlliancePresets {
         return currentCypher;
     }
 
-    public static void setCurrentCypher(int cypher) {
+    public static void setCurrentCypherId(int cypher) {
         currentCypher = cypher;
     }
 }

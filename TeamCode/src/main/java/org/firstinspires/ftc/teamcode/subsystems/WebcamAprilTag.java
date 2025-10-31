@@ -55,11 +55,11 @@ public class WebcamAprilTag extends SubsystemBase {
     public void detectDuringInit() {
         ArrayList<AprilTagDetection> currentDetections = pipeline.getLatestDetections();
 
-        if (currentDetections.size() != 0) {
+        if (!currentDetections.isEmpty()) {
             boolean tagFound = false;
 
             for (AprilTagDetection tag : currentDetections) {
-                if (tag.id == 21 || tag.id == 22 || tag.id == 23) {
+                if (tag.id == 21 || tag.id == 22 || tag.id == 23) { // 21=GPP, 22=PGP, 23=PPG
                     tagOfInterest = tag;
                     detectedTagId = tag.id;
                     tagFound = true;
@@ -74,6 +74,7 @@ public class WebcamAprilTag extends SubsystemBase {
     }
 
     public int getDetectedTag() {
+        AlliancePresets.setCurrentCypherId(detectedTagId);
         return detectedTagId;
     }
 
@@ -83,26 +84,5 @@ public class WebcamAprilTag extends SubsystemBase {
 
     public AprilTagDetection getTagOfinterest() {
         return tagOfInterest;
-    }
-
-    public int getDetectedCypherFromTag() {
-        int cypher = -1;
-        switch (getDetectedTag()) {
-            case 21:
-                cypher = 0;
-                break;
-
-            case 22:
-                cypher = 1;
-                break;
-
-            case 23:
-                cypher = 2;
-                break;
-        }
-
-        AlliancePresets.setCurrentCypher(cypher);
-
-        return cypher;
     }
 }

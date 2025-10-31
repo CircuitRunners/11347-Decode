@@ -20,7 +20,7 @@ public class BeamBreakHelper extends SubsystemBase {
         intakeBeamBreak.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    ///  Updates the beamBreak every loop
+    ///  Call this every loop to update beambreak status
     public void update() {
         boolean isBeamBroken = !getBeamState(); // false means the beam is broken
         if (isBeamBroken) {

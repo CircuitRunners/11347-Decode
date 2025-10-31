@@ -24,7 +24,7 @@ import java.util.List;
 @Config
 @Configurable
 @Autonomous(name="Red Side Auto", group="Red Autos")
-public class RedSideAuto extends OpMode {
+public class RedSideAutoFar extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;

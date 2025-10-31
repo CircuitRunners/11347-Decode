@@ -24,7 +24,7 @@ import java.util.List;
 @Config
 @Configurable
 @Autonomous(name="Blue Side Auto",group="Blue Autos")
-public class GPPAuto extends OpMode {
+public class BlueSideAutoFar extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
