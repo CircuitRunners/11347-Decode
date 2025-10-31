@@ -163,8 +163,8 @@ public class MainTeleOp extends CommandOpMode {
                 }));
 
         if (aimServoLimit) {
-            if (out.getAimPos() > 0.48) {
-                out.setAim(0.48);
+            if (out.getAimPos() > 0.55) {
+                out.setAim(0.55);
             }
             if (out.getAimPos() < 0) {
                 out.setAim(0);
@@ -194,6 +194,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Position", data);
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
+        telemetry.addData("Soft limit On?", aimServoLimit);
         telemetry.update();
     }
 
