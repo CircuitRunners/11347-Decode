@@ -213,6 +213,7 @@ public class BlueSideAutoFar extends OpMode {
             case -2:
                 if (!follower.isBusy()) {
                     shooter.setTargetRPM(3350);
+                    out.aimScoring();
                     setPathState(0);
                 }
                 break;

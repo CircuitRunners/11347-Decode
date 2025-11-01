@@ -55,7 +55,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
         blockingServoLeft.setPosition(BlockState.BLOCK.getLeft());
         blockingServoRight.setPosition(BlockState.BLOCK.getRight());
-        aimScoring();
+        aimClose();
 
         block = new RunAction(this::block);
         unblock = new RunAction(this::unblock);
