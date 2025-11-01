@@ -41,7 +41,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void transfer() {
-        runIntake(0.5);
+        runIntake(0.6);
         runTransfer(1);
     }
 

@@ -78,14 +78,16 @@ public class MainTeleOp extends CommandOpMode {
         // Shooting
         // Click bumper once to activate intake at full speed
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(3200)));
-        out.aimMax();
+                .whenPressed(new InstantCommand(()-> {
+                    shooter.setTargetRPM(3200);
+                    out.aimScoring();
+                }));
 
         // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
                     shooter.setTargetRPM(2500);
-                    out.aimMin();
+                    out.aimClose();
                 }));
 
         manipulator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
@@ -159,7 +161,7 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
                 .whenPressed(new InstantCommand(()-> {
-                    pinpoint.recalibrateIMU();
+                    pinpoint.resetPosAndIMU();
                 }));
 
         if (aimServoLimit) {

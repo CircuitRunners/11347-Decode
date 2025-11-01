@@ -10,6 +10,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -21,10 +22,11 @@ import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
 
+@Disabled
 @Config
 @Configurable
-@Autonomous(name="Red Side Auto", group="Red Autos", preselectTeleOp="MainTeleOp")
-public class RedSideAutoFar extends OpMode {
+@Autonomous(name="Run for Red", group="Red Autos", preselectTeleOp="MainTeleOp")
+public class RedSideAutoFarLGM1 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
@@ -41,133 +43,114 @@ public class RedSideAutoFar extends OpMode {
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8, line9, line10, line11, line12;
 
-    
-            public Paths(Follower follower) {
-                Path1 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(104.000, 8.200),
-                      new Pose(87.000, 19.200),
-                      new Pose(82.000, 14.000)
-                    )
-                  )
-                  .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(64))
-                  .build();
-          
-                Path2 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(82.000, 14.000),
-                      new Pose(87.700, 27.300),
-                      new Pose(103.000, 35.500)
-                    )
-                  )
-                  .setLinearHeadingInterpolation(Math.toRadians(64), Math.toRadians(0))
-                  .build();
-          
-                Path3 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierLine(new Pose(103.000, 35.500), new Pose(136.000, 35.500))
-                  )
-                  .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                  .build();
-          
-                Path4 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(136.000, 35.500),
-                      new Pose(94.400, 48.000),
-                      new Pose(90.500, 90.000)
-                    )
-                  )
-                  .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
-                  .build();
-          
-                Path5 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(90.500, 90.000),
-                      new Pose(87.700, 65.000),
-                      new Pose(103.500, 60.000)
-                    )
-                  )
-                  .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
-                  .build();
-          
-                Path6 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierLine(new Pose(103.500, 60.000), new Pose(136.500, 60.000))
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-          
-                Path7 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(136.500, 60.000),
-                      new Pose(89.000, 48.000),
-                      new Pose(90.500, 90.000)
-                    )
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-          
-                Path8 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(90.500, 90.000),
-                      new Pose(100.000, 86.000),
-                      new Pose(103.500, 84.000)
-                    )
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-          
-                Path9 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierLine(new Pose(103.500, 84.000), new Pose(130.500, 84.000))
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-          
-                Path10 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierCurve(
-                      new Pose(130.500, 84.000),
-                      new Pose(89.000, 62.000),
-                      new Pose(90.500, 90.000)
-                    )
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-          
-                Path11 = follower
-                  .pathBuilder()
-                  .addPath(
-                    new BezierLine(new Pose(90.500, 90.000), new Pose(38.000, 34.000))
-                  )
-                  .setTangentHeadingInterpolation()
-                  .build();
-              }
-            }
-          
-            public int autonomousPathUpdate() {
-              // Add your state machine Here
-              // Access paths with paths.pathName
-              // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
-              return pathState;
-            }
-          }
+
+    public void buildPaths() {
+        line1 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(104.000, 8.200),
+                                new Pose(87.000, 19.200),
+                                new Pose(82.000, 14.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(64))
+                .build();
+
+        line2 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(82.000, 14.000),
+                                new Pose(87.700, 27.300),
+                                new Pose(103.000, 35.500)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(64), Math.toRadians(0))
+                .build();
+
+        line3 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(103.000, 35.500), new Pose(136.000, 35.500))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .build();
+
+        line4 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(136.000, 35.500),
+                                new Pose(94.400, 48.000),
+                                new Pose(90.500, 90.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+
+        line5 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(90.500, 90.000),
+                                new Pose(87.700, 65.000),
+                                new Pose(103.500, 60.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        line6 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(103.500, 60.000), new Pose(136.500, 60.000))
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line7 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(136.500, 60.000),
+                                new Pose(89.000, 48.000),
+                                new Pose(90.500, 90.000)
+                        )
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line8 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(90.500, 90.000),
+                                new Pose(100.000, 86.000),
+                                new Pose(103.500, 84.000)
+                        )
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line9 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(103.500, 84.000), new Pose(130.500, 84.000))
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line10 = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(130.500, 84.000),
+                                new Pose(89.000, 62.000),
+                                new Pose(90.500, 90.000)
+                        )
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line11 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(90.500, 90.000), new Pose(38.000, 34.000))
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+    }
+
 
     @Override
     public void init() {
@@ -219,14 +202,14 @@ public class RedSideAutoFar extends OpMode {
         limelight.update();
         autonomousPathUpdate();
 
-//        if (headingLockEnabled && limelight.hasValidTarget()) {
-//            LLResult result = limelight.getLatest();
-//            if (result != null && result.isValid()) {
-//                double finalRotation = result.getTxNC() * 0.02;
-//                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
-//                follower.setRotation(finalRotation);
-//            }
-//        }
+    //        if (headingLockEnabled && limelight.hasValidTarget()) {
+    //            LLResult result = limelight.getLatest();
+    //            if (result != null && result.isValid()) {
+    //                double finalRotation = result.getTxNC() * 0.02;
+    //                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
+    //                follower.setRotation(finalRotation);
+    //            }
+    //        }
 
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
