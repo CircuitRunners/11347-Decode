@@ -155,12 +155,12 @@ public class RedSideAutoFar extends OpMode {
         AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.RED.getTagId());
 
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.update();
     }
 
     @Override
     public void init_loop() {
+        telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.addData("Pinpoint X", follower.getPose().getX());
         telemetry.addData("Pinpoint Y", follower.getPose().getY());
         telemetry.addData("Heading (deg)", Math.toDegrees(follower.getPose().getHeading()));

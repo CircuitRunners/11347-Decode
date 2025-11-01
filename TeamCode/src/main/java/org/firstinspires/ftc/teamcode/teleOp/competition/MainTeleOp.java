@@ -115,6 +115,7 @@ public class MainTeleOp extends CommandOpMode {
                         .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
 
         telemetry.addLine("ROBOT READY!");
+        telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.addData("Current Alliance Tag", limelight.getLimelightAllianceTagID());
         telemetry.update();
     }
@@ -186,7 +187,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Ty", limelight.getTy());
         telemetry.addLine();
         telemetry.addLine("----  Subsystems Data  ----");
-        telemetry.addData("Heading Lock Active?", headingLockEnabled);
+        telemetry.addData("Heading Lock Active for Team ID "+ AlliancePresets.getAllianceShooterTag() +"?", headingLockEnabled);
         telemetry.addData("Shooter Encoder Velo", shooter.getShooterVelocity());
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
         telemetry.addData("Beam Break State: ", beamBreak.getBeamState());
