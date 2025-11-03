@@ -23,8 +23,8 @@ import java.util.List;
 
 @Config
 @Configurable
-@Autonomous(name="Blue Side Auto",group="Blue Autos", preselectTeleOp="MainTeleOp")
-public class BlueSideAutoFar extends OpMode {
+@Autonomous(name="Blue Side RUN WITH 1002 ONLY",group="Blue Autos", preselectTeleOp="MainTeleOp")
+public class BlueSideAlt extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
@@ -74,12 +74,12 @@ public class BlueSideAutoFar extends OpMode {
         line4 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(11.000, 35.000),
-                                new Pose(60.000, 48.000),
-                                new Pose(53.500, 90.000)
+                                new Pose(40.000, 8.200),
+                                new Pose(56.800, 19.200),
+                                new Pose(62.000, 14.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(116))
                 .build();
 
         line5 = follower.pathBuilder()
@@ -212,7 +212,7 @@ public class BlueSideAutoFar extends OpMode {
         switch (pathState) {
             case -2:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(3450);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -260,7 +260,7 @@ public class BlueSideAutoFar extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(3450);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
@@ -268,17 +268,18 @@ public class BlueSideAutoFar extends OpMode {
 
             case -4:
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 20) {
+                    if (shootTime.getElapsedTimeSeconds() < 25) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2100) {
+                        } else if (shooter.getShooterVelocity() < 3200) {
                             stopTransfer();
                         }
                     } else {
                         stopTransfer();
                         out.block();
-                        intake();
-                        setPathState(4);
+//                        intake();
+                        out.aimClose();
+//                        setPathState(4);
                     }
                 }
                 break;
@@ -300,8 +301,7 @@ public class BlueSideAutoFar extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(2400);
                     follower.followPath(line7);
                     setPathState(-9);
                 }
@@ -321,11 +321,12 @@ public class BlueSideAutoFar extends OpMode {
 //                break;
 
             case -9:
+                stopIntake();
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 26) {
+                    if (shootTime.getElapsedTimeSeconds() < 24) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2100) {
+                        } else if (shooter.getShooterVelocity() < 2250) {
                             stopTransfer();
                         }
                     } else {
@@ -347,18 +348,15 @@ public class BlueSideAutoFar extends OpMode {
 
             case 10:
                 if (!follower.isBusy()) {
-                    shooter.eStop();
                     follower.followPath(line11);
-//                    setPathState(11);
-                    follower.pausePathFollowing();
-
+                    setPathState(11);
                 }
                 break;
 
             case 11:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(2400);
                     follower.followPath(line12);
                     setPathState(12);
                 }

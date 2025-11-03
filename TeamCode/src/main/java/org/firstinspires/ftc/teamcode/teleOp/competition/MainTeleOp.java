@@ -127,7 +127,7 @@ public class MainTeleOp extends CommandOpMode {
         limelight.update();
         beamBreak.update();
 
-        out.aiming(gamepad1.dpad_down, gamepad1.dpad_up);
+        out.aiming(gamepad1.cross, gamepad1.triangle);
 
         double forward = driver.getLeftY(); // Forwards/backwards
         double right = driver.getLeftX(); // Strafe

@@ -212,7 +212,7 @@ public class RedSideAutoFar extends OpMode {
         switch (pathState) {
             case -2:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(3350);
+                    shooter.setTargetRPM(3400);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -260,24 +260,26 @@ public class RedSideAutoFar extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2400);
+                    shooter.setTargetRPM(2450);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
                 break;
 
             case -4:
-                if (shootTime.getElapsedTimeSeconds() < 16) {
-                    if (shooter.isAtTargetThreshold()) {
-                        transfer();
-                    } else if (shooter.getShooterVelocity() < 2250) {
+                if (!follower.isBusy()) {
+                    if (shootTime.getElapsedTimeSeconds() < 18) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        } else if (shooter.getShooterVelocity() < 2100) {
+                            stopTransfer();
+                        }
+                    } else {
                         stopTransfer();
+                        out.block();
+                        intake();
+                        setPathState(4);
                     }
-                } else {
-                    stopTransfer();
-                    out.block();
-                    intake();
-                    setPathState(4);
                 }
                 break;
 
@@ -298,7 +300,8 @@ public class RedSideAutoFar extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(2400);
+                    stopIntake();
+                    shooter.setTargetRPM(2450);
                     follower.followPath(line7);
                     setPathState(-9);
                 }
@@ -318,12 +321,11 @@ public class RedSideAutoFar extends OpMode {
 //                break;
 
             case -9:
-                stopIntake();
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 24) {
+                    if (shootTime.getElapsedTimeSeconds() < 26) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2250) {
+                        } else if (shooter.getShooterVelocity() < 2100) {
                             stopTransfer();
                         }
                     } else {
@@ -345,15 +347,17 @@ public class RedSideAutoFar extends OpMode {
 
             case 10:
                 if (!follower.isBusy()) {
+                    shooter.eStop();
                     follower.followPath(line11);
-                    setPathState(11);
+//                    setPathState(11);
+                    follower.pausePathFollowing();
                 }
                 break;
 
             case 11:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2400);
+                    shooter.setTargetRPM(2450);
                     follower.followPath(line12);
                     setPathState(12);
                 }
