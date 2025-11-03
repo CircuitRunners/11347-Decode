@@ -78,14 +78,16 @@ public class MainTeleOp extends CommandOpMode {
         // Shooting
         // Click bumper once to activate intake at full speed
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(()-> shooter.setTargetRPM(3200)));
-        out.aimMax();
+                .whenPressed(new InstantCommand(()-> {
+                    shooter.setTargetRPM(3200);
+                    out.aimScoring();
+                }));
 
         // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
                     shooter.setTargetRPM(2500);
-                    out.aimMin();
+                    out.aimClose();
                 }));
 
         manipulator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
@@ -113,6 +115,7 @@ public class MainTeleOp extends CommandOpMode {
                         .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
 
         telemetry.addLine("ROBOT READY!");
+        telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.addData("Current Alliance Tag", limelight.getLimelightAllianceTagID());
         telemetry.update();
     }
@@ -124,7 +127,7 @@ public class MainTeleOp extends CommandOpMode {
         limelight.update();
         beamBreak.update();
 
-        out.aiming(gamepad1.dpad_down, gamepad1.dpad_up);
+        out.aiming(gamepad1.cross, gamepad1.triangle);
 
         double forward = driver.getLeftY(); // Forwards/backwards
         double right = driver.getLeftX(); // Strafe
@@ -159,7 +162,7 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
                 .whenPressed(new InstantCommand(()-> {
-                    pinpoint.recalibrateIMU();
+                    pinpoint.resetPosAndIMU();
                 }));
 
         if (aimServoLimit) {
@@ -184,7 +187,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Ty", limelight.getTy());
         telemetry.addLine();
         telemetry.addLine("----  Subsystems Data  ----");
-        telemetry.addData("Heading Lock Active?", headingLockEnabled);
+        telemetry.addData("Heading Lock Active for Team ID "+ AlliancePresets.getAllianceShooterTag() +"?", headingLockEnabled);
         telemetry.addData("Shooter Encoder Velo", shooter.getShooterVelocity());
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
         telemetry.addData("Beam Break State: ", beamBreak.getBeamState());

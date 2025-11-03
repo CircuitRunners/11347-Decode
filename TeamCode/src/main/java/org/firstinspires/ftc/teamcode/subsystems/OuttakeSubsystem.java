@@ -29,8 +29,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public enum AimState {
-        AIM_MAX(0.48),
-        AIM_MIN(0.37);
+        AIM_MAX(0.25),
+        AIM_MIN(0.00);
 
         public final double position;
         AimState(double position) {
@@ -47,7 +47,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     public Servo aimingServo;
 
     public OuttakeSubsystem(HardwareMap hardwareMap) {
-        blockingServoLeft = hardwareMap.get(Sxrvo.class, "blockingLeft");
+        blockingServoLeft = hardwareMap.get(Servo.class, "blockingLeft");
         blockingServoRight = hardwareMap.get(Servo.class, "blockingRight");
         aimingServo = hardwareMap.get(Servo.class, "aimServo");
         aimingServo.setDirection(Servo.Direction.REVERSE);
@@ -55,8 +55,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
         blockingServoLeft.setPosition(BlockState.BLOCK.getLeft());
         blockingServoRight.setPosition(BlockState.BLOCK.getRight());
-//        aimingServo.setPosition(AimState.AIM_MIN.getPosition());
-        aimScoring();
+        aimClose();
 
         block = new RunAction(this::block);
         unblock = new RunAction(this::unblock);
@@ -98,7 +97,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void aimScoring() {
-        aimingServo.setPosition(0.17);
+        setAim(0.28);
+    }
+
+    public void aimClose() {
+        setAim(0.19);
     }
 
     public void setAim(double position) {
