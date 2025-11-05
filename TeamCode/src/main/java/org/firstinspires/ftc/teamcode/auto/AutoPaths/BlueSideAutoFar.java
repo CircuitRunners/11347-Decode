@@ -49,7 +49,7 @@ public class BlueSideAutoFar extends OpMode {
                         new BezierCurve(
                                 new Pose(40.000, 8.200),
                                 new Pose(56.800, 19.200),
-                                new Pose(62.000, 14.000)
+                                new Pose(55.000, 14.000)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(114))
@@ -58,7 +58,7 @@ public class BlueSideAutoFar extends OpMode {
         line2 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(62.000, 14.000),
+                                new Pose(55.000, 14.000),
                                 new Pose(56.300, 27.200),
                                 new Pose(41.000, 35.000)
                         )
@@ -67,7 +67,7 @@ public class BlueSideAutoFar extends OpMode {
                 .build();
 
         line3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(41.000, 35.000), new Pose(11.000, 35.000)))
+                .addPath(new BezierLine(new Pose(41.000, 35.000), new Pose(8.000, 35.000)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
 
@@ -75,7 +75,7 @@ public class BlueSideAutoFar extends OpMode {
                 .addPath(
                         new BezierCurve(
                                 new Pose(11.000, 35.000),
-                                new Pose(60.000, 48.000),
+                                new Pose(60.000, 50.000),
                                 new Pose(53.500, 90.000)
                         )
                 )
@@ -88,7 +88,7 @@ public class BlueSideAutoFar extends OpMode {
                 .build();
 
         line6 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(42.000, 83.000), new Pose(15.000, 83.000)))
+                .addPath(new BezierLine(new Pose(42.000, 83.000), new Pose(11.000, 83.000)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
 
@@ -212,6 +212,7 @@ public class BlueSideAutoFar extends OpMode {
         switch (pathState) {
             case -2:
                 if (!follower.isBusy()) {
+                    follower.setMaxPower(1);
                     shooter.setTargetRPM(3400);
                     out.aimScoring();
                     setPathState(0);
@@ -227,10 +228,10 @@ public class BlueSideAutoFar extends OpMode {
                 break;
 
             case -1:
-                if (shootTime.getElapsedTimeSeconds() < 7.5) {
+                if (shootTime.getElapsedTimeSeconds() < 7) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3200) {
+                    } else if (shooter.getShooterVelocity() < 3100) {
                         stopTransfer();
                     }
                 } else {
@@ -260,7 +261,7 @@ public class BlueSideAutoFar extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(2650);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
@@ -268,10 +269,10 @@ public class BlueSideAutoFar extends OpMode {
 
             case -4:
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 20) {
+                    if (shootTime.getElapsedTimeSeconds() < 16) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2100) {
+                        } else if (shooter.getShooterVelocity() < 2400) {
                             stopTransfer();
                         }
                     } else {
@@ -301,7 +302,7 @@ public class BlueSideAutoFar extends OpMode {
             case 6:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(2650);
                     follower.followPath(line7);
                     setPathState(-9);
                 }
@@ -322,10 +323,10 @@ public class BlueSideAutoFar extends OpMode {
 
             case -9:
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 26) {
+                    if (shootTime.getElapsedTimeSeconds() < 22) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2100) {
+                        } else if (shooter.getShooterVelocity() < 2400) {
                             stopTransfer();
                         }
                     } else {
@@ -349,8 +350,8 @@ public class BlueSideAutoFar extends OpMode {
                 if (!follower.isBusy()) {
                     shooter.eStop();
                     follower.followPath(line11);
-//                    setPathState(11);
-                    follower.pausePathFollowing();
+                    setPathState(11);
+                    //follower.pausePathFollowing();
 
                 }
                 break;
@@ -358,7 +359,7 @@ public class BlueSideAutoFar extends OpMode {
             case 11:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(2450);
+                    shooter.setTargetRPM(2550);
                     follower.followPath(line12);
                     setPathState(12);
                 }
@@ -369,7 +370,7 @@ public class BlueSideAutoFar extends OpMode {
                     if (shootTime.getElapsedTimeSeconds() < 31) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 2250) {
+                        } else if (shooter.getShooterVelocity() < 2300) {
                             stopTransfer();
                         }
                     } else {
