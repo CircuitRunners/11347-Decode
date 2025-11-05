@@ -202,14 +202,14 @@ public class RedSideAutoFarLGM1 extends OpMode {
         limelight.update();
         autonomousPathUpdate();
 
-    //        if (headingLockEnabled && limelight.hasValidTarget()) {
-    //            LLResult result = limelight.getLatest();
-    //            if (result != null && result.isValid()) {
-    //                double finalRotation = result.getTxNC() * 0.02;
-    //                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
-    //                follower.setRotation(finalRotation);
-    //            }
-    //        }
+        //        if (headingLockEnabled && limelight.hasValidTarget()) {
+        //            LLResult result = limelight.getLatest();
+        //            if (result != null && result.isValid()) {
+        //                double finalRotation = result.getTxNC() * 0.02;
+        //                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
+        //                follower.setRotation(finalRotation);
+        //            }
+        //        }
 
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
@@ -376,5 +376,4 @@ public class RedSideAutoFarLGM1 extends OpMode {
         out.block();
         intaking = false;
     }
-
-
+}
