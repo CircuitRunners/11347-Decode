@@ -30,6 +30,10 @@ public class StaticShooter extends SubsystemBase {
     private static double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
     private boolean active;
 
+    //--- hood caculator pid values ---
+    private static final double GRAVITY_IN_PER_S2 = 386.09; // inches per second squared
+    private static final double VELOCITY_CONSTANT = 0.025;
+
     // --- PIDF Coefficients ---
     //working value 35 on October 9th, 2025
 /*    public double kP = 35.0;
@@ -222,4 +226,36 @@ public class StaticShooter extends SubsystemBase {
     public boolean isAtTargetThreshold() {
         return ((getShooterVelocity() > (getTargetRPM() - 200)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
     }
+
+    public static double calculateHoodAngle(
+            double distanceInches,
+            double shooterHeightInches,
+            double goalHeightInches,
+            double rpm,
+            boolean useHighArc) {
+
+        double h = goalHeightInches - shooterHeightInches; // vertical height difference
+        double g = GRAVITY_IN_PER_S2;
+        double v0 = VELOCITY_CONSTANT * rpm; // convert RPM → linear velocity
+
+        // Discriminant inside the square root
+        double discriminant = v0 * v0 * v0 * v0 - g * (g * distanceInches * distanceInches + 2 * h * v0 * v0);
+
+        if (discriminant < 0) {
+            // No real solution → can't reach that distance with given speed
+            return 0.0;
+        }
+
+        double sqrtTerm = Math.sqrt(discriminant);
+
+        // Two possible angles (high arc or low arc)
+        double numerator = v0 * v0 + (useHighArc ? sqrtTerm : -sqrtTerm);
+        double denominator = g * distanceInches;
+
+        double thetaRad = Math.atan(numerator / denominator);
+
+        // Convert radians → degrees for servo/hood control
+        return Math.toDegrees(thetaRad);
+    }
 }
+

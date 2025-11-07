@@ -83,6 +83,11 @@ public class OuttakeSubsystem extends SubsystemBase {
         setBlockPosition(BlockState.UNBLOCK);
     }
 
+    public void aimServo(double value) {
+        blockingServoLeft.setPosition(value);
+    }
+
+
     public void setBlockPosition(BlockState state) {
         blockingServoLeft.setPosition(state.getLeft());
         blockingServoRight.setPosition(state.getRight());

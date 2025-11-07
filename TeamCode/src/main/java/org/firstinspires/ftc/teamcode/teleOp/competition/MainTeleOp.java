@@ -43,6 +43,7 @@ public class MainTeleOp extends CommandOpMode {
     private GobildaRGBIndicatorHelper rgbHelper;
     private BeamBreakHelper beamBreak;
     private boolean aimServoLimit = true;
+    private boolean calculateHood = true;
 
     // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
@@ -114,6 +115,15 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                         .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
 
+
+
+        //Hood calculator
+        manipulator.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new InstantCommand(()-> calculateHood = true));
+        manipulator.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whenPressed(new InstantCommand(()-> calculateHood = false));
+
+
         telemetry.addLine("ROBOT READY!");
         telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.addData("Current Alliance Tag", limelight.getLimelightAllianceTagID());
@@ -133,15 +143,26 @@ public class MainTeleOp extends CommandOpMode {
         double right = driver.getLeftX(); // Strafe
         double rotate = driver.getRightX(); // Rotation
 
-        if (headingLockEnabled && limelight.hasValidTarget()) {
-            LLResult result = limelight.getLatest();
-            if (result != null && result.isValid()) {
-                double finalRotation = result.getTxNC() * tP;
-                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
-                rotate = finalRotation;
-            }
-        }
+//        if (headingLockEnabled && limelight.hasValidTarget()) {
+//            LLResult result = limelight.getLatest();
+//            if (result != null && result.isValid()) {
+//                double finalRotation = result.getTxNC() * tP;
+//                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
+//                rotate = finalRotation;
+//            }
+//        }
 
+        if(calculateHood && limelight.hasValidTarget()){
+            double hoodAngle = shooter.calculateHoodAngle(
+                    limelight.getDistanceToTagCenterInches(true),
+                    11.976,   // shooter height (in)
+                    38.75,   // goal center height (in)
+                    shooter.getShooterVelocity(),
+                    false   // use low arc
+            );
+
+            out.aimServo(hoodAngle);
+        }
         Pose2D pose;
         pose = driveFieldRelative(forward, right, rotate);
 
@@ -180,6 +201,7 @@ public class MainTeleOp extends CommandOpMode {
 
         // --- Telemetry ---
         // Limelight Distance Calc
+        telemetry.addData("Hood on?", calculateHood);
         telemetry.addLine("----  Limelight Data  ----");
         telemetry.addData("Distance (LOS, in)", distLOS);
         telemetry.addData("Distance (Ground, in)", distGround);
