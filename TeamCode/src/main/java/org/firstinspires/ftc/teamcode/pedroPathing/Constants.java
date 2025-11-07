@@ -13,46 +13,45 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.support.PinpointOdo;
+import org.firstinspires.ftc.teamcode.support.SRSHub;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(8)
-            .forwardZeroPowerAcceleration(-55.6006)
-            .lateralZeroPowerAcceleration(-72.934)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.025))
-            .headingPIDFCoefficients(new PIDFCoefficients(1.1, 0, 0.05, .01))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0.0,0.000001,0.6,0.01));
+            .mass(11.1)
+            .forwardZeroPowerAcceleration(-29.64945897478038)
+            .lateralZeroPowerAcceleration(-53.7580800784387)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.25, 0, 0.025, 0.025))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.2, 0, 0.02, 0.02))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.012, 0, 0.001, 0.6, 0.025))
+            .centripetalScaling(0.0007);
+
+    public static PathConstraints pathConstraints = new PathConstraints(
+            0.99,
+            100,
+            0.8,
+            1);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName("rightFront")
-            .rightRearMotorName("rightBack")
-            .leftRearMotorName("leftBack")
-            .leftFrontMotorName("leftFront")
+            .rightFrontMotorName("fr")
+            .rightRearMotorName("br")
+            .leftRearMotorName("bl")
+            .leftFrontMotorName("fl")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(60.355)
-            .yVelocity(51.472);
-    //-71.408
-    //-72.591
-    //-71.820
-    //-75.915
-
-
+            .xVelocity(1.6704066118856116)
+            .yVelocity(3.927147842767667);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5)
-            .strafePodX(0.5)
-            .distanceUnit(DistanceUnit.INCH)
-            .hardwareMapName("odo")
+            .forwardPodY(-28.042) //-147.012
+            .strafePodX(-147.012) //28.042
+            .distanceUnit(DistanceUnit.MM)
+            .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
@@ -61,4 +60,19 @@ public class Constants {
                 .mecanumDrivetrain(driveConstants)
                 .build();
     }
+
+//    public static SRSConstants localizerConstants = new SRSConstants()
+//            .forwardPodY(-28.042f)
+//            .strafePodX(-147.012f)
+//            .encoderResolution(19.89436789f)
+//            .forwardEncoderDirection(SRSHub.GoBildaPinpoint.EncoderDirection.FORWARD)
+//            .strafeEncoderDirection(SRSHub.GoBildaPinpoint.EncoderDirection.REVERSED);
+//
+//    public static SRSFollower createFollower(HardwareMap hardwareMap) {
+//        return new SRSFollowerBuilder(followerConstants, hardwareMap)
+//                .srsLocalizer(localizerConstants)
+//                .pathConstraints(pathConstraints)
+//                .mecanumDrivetrain(driveConstants)
+//                .build();
+//    }
 }

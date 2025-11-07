@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleOp;
+package org.firstinspires.ftc.teamcode.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,9 +17,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  * Only add kI if you see steady-state error that kF+kP can’t fix, prob won't be needed
  * Add kD to damp oscillations during spin-up, might not be needed
  */
-@TeleOp
+@Disabled
 @Config
-public class shooterPIDTest extends CommandOpMode {
+@TeleOp
+public class ShooterPIDTest extends CommandOpMode {
     private DcMotorEx shooter;
     public GamepadEx driver;
 
@@ -115,31 +117,3 @@ public class shooterPIDTest extends CommandOpMode {
         dash.sendTelemetryPacket(packet);
     }
 }
-
-
-//        double motorRPM = MOTOR_RPM;
-//        double targetTicksPerSec = (motorRPM * TICKS_PER_REV) / 60.0;
-//
-//        if (gamepad1.right_bumper) {
-//            runShooter = !runShooter;
-//        }
-//
-//        if (runShooter) {
-//            shooter.setVelocity(targetTicksPerSec);
-//        } else {
-//            shooter.setVelocity(0);
-//        }
-//
-//        double currTicksPerSec = shooter.getVelocity(); // ticks/s (motor)
-//        double currMotorRPM    = (currTicksPerSec * 60.0) / TICKS_PER_REV;
-//        double currShooterRPM  = currMotorRPM * GEAR_RATIO;
-//
-//        telemetry.addData("Target Shooter RPM", TARGET_RPM);
-//        telemetry.addData("Target Motor RPM", motorRPM);
-//        telemetry.addData("Target Ticks/s", targetTicksPerSec);
-//
-//        telemetry.addData("Curr Motor RPM", "%.1f", currMotorRPM);
-//        telemetry.addData("Curr Shooter RPM (est.)", "%.1f", currShooterRPM);
-//        telemetry.addData("Curr Ticks/s", "%.0f", currTicksPerSec);
-//        telemetry.update();
-

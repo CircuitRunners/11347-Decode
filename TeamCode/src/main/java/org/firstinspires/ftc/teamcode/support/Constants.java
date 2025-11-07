@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.support;
 
 import com.acmerobotics.dashboard.config.Config;
 
-
+@Deprecated
 @Config
 public class Constants {
 

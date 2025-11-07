@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  * Provides PIDF tuning, velocity targeting, and telemetry integration with FTC Dashboard.
  */
 @Config
-public class StaticShooter {
+public class StaticShooter extends SubsystemBase {
     // --- Hardware ---
     private DcMotorEx shooter;
 
@@ -27,6 +28,7 @@ public class StaticShooter {
     private static double MOTOR_RPM = 1620.0;          // motor RPM (based on max motor rpm)
     private static double GEAR_RATIO = 2.5;            // gear ratio from motor to shooter
     private static double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
+    private boolean active;
 
     // --- PIDF Coefficients ---
     //working value 35 on October 9th, 2025
@@ -73,6 +75,7 @@ public class StaticShooter {
         setMotorRPM(defaultMotorRPM);
         setGearRatio(defaultGearRatio);
         setTicksPerRev(defaultTicks);
+        active = Math.abs(getTargetRPM()) > 0;
 
         // Apply initial PIDF coefficients
         applyPIDF();
@@ -118,6 +121,11 @@ public class StaticShooter {
         TARGET_RPM = targetRPM;
     }
 
+    /**
+     * Returns the target RPM of the shooter, used to check if velo
+     * is within tolerance
+     * @return returns the target RPM of the shooter
+     */
     public double getTargetRPM() {
         return TARGET_RPM;
     }
@@ -144,6 +152,14 @@ public class StaticShooter {
     }
 
     /**
+     * Returns the current gear ratio of the shooter
+     * @return returns the current GEAR_RATIO of the shooter system
+     */
+    public double getGearRatio() {
+        return GEAR_RATIO;
+    }
+
+    /**
      * Changes the Ticks Per Revolution of the motor
      * Called Encoder Resolution on gobilda website
      * @param TicksPerRev Set to the Ticks per rev of the motor
@@ -154,12 +170,22 @@ public class StaticShooter {
     }
 
     /**
+     * Returns the current Ticks Per Rev of the shooter
+     * @return returns the TICKS_PER_REV of the shooter flywheel
+     */
+    public double getTicksPerRev() {
+        return TICKS_PER_REV;
+    }
+
+    /**
      * Calculates ticks per second based on target RPM
      * Sets the target velocity
      * */
-    public void runShooter() {
+    public void update() {
         double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
         shooter.setVelocity(targetTicksPerSec);
+
+        active = Math.abs(getTargetRPM()) > 0;
     }
 
     /** Stops all shooter motion immediately. */
@@ -187,5 +213,13 @@ public class StaticShooter {
      */
     public double getMotorVoltage() {
         return shooter.getCurrent(CurrentUnit.AMPS);
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public boolean isAtTargetThreshold() {
+        return ((getShooterVelocity() > (getTargetRPM() - 200)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
     }
 }
