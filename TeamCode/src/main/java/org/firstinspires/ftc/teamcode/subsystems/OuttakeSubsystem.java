@@ -29,8 +29,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public enum AimState {
-        AIM_MAX(0.25),
-        AIM_MIN(0.00);
+        AIM_MAX(0.18),
+        AIM_MIN(0.162);
 
         public final double position;
         AimState(double position) {
@@ -97,11 +97,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void aimScoring() {
-        setAim(0.28);
+        setAim(0.205);
     }
 
     public void aimClose() {
-        setAim(0.19);
+        setAim(0.162);
     }
 
     public void setAim(double position) {
