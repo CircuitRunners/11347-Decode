@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleOp.competition;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -41,7 +39,7 @@ public class MainTeleOp extends CommandOpMode {
     private GoBildaPinpointDriver pinpoint;
     private LimelightSubsystem limelight;
     private GobildaRGBIndicatorHelper rgbHelper;
-    private BeamBreakHelper beamBreak;
+    private BeamBreakHelper intakeBeamBreak;
     private boolean aimServoLimit = true;
 
     // HEADING LOCK STUFF
@@ -69,7 +67,8 @@ public class MainTeleOp extends CommandOpMode {
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
         rgbHelper = new GobildaRGBIndicatorHelper(hardwareMap);
-        beamBreak = new BeamBreakHelper(hardwareMap);
+        intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 0);
+
 
         // Default Commands
         // Intake Command
@@ -125,7 +124,7 @@ public class MainTeleOp extends CommandOpMode {
         super.run();
         shooter.update();
         limelight.update();
-        beamBreak.update();
+        intakeBeamBreak.update();
 
         out.aiming(gamepad1.cross, gamepad1.triangle);
 
@@ -133,21 +132,21 @@ public class MainTeleOp extends CommandOpMode {
         double right = driver.getLeftX(); // Strafe
         double rotate = driver.getRightX(); // Rotation
 
-        if (headingLockEnabled && limelight.hasValidTarget()) {
-            LLResult result = limelight.getLatest();
-            if (result != null && result.isValid()) {
-                double finalRotation = result.getTxNC() * tP;
-                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
-                rotate = finalRotation;
-            }
-        }
+//        if (headingLockEnabled && limelight.hasValidTarget()) {
+//            LLResult result = limelight.getLatest();
+//            if (result != null && result.isValid()) {
+//                double finalRotation = result.getTxNC() * tP;
+//                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
+//                rotate = finalRotation;
+//            }
+//        }
 
         Pose2D pose;
         pose = driveFieldRelative(forward, right, rotate);
 
         if (shooter.isAtTargetThreshold()) {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.BLUE);
-        } else if (beamBreak.isBeamStable()) {
+        } else if (intakeBeamBreak.isBeamStable()) {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.GREEN);
         } else {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.RED);
@@ -160,7 +159,7 @@ public class MainTeleOp extends CommandOpMode {
                 pose.getHeading(AngleUnit.DEGREES)
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+        driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new InstantCommand(()-> {
                     pinpoint.resetPosAndIMU();
                 }));
@@ -190,7 +189,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Heading Lock Active for Team ID "+ AlliancePresets.getAllianceShooterTag() +"?", headingLockEnabled);
         telemetry.addData("Shooter Encoder Velo", shooter.getShooterVelocity());
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
-        telemetry.addData("Beam Break State: ", beamBreak.getBeamState());
+        telemetry.addData("Beam Break State: ", intakeBeamBreak.isBeamBroken());
         telemetry.addData("RGB Colour", rgbHelper.getCurrentColour());
         telemetry.addLine();
         telemetry.addLine("----  Pinpoint Data  ----");
@@ -203,8 +202,9 @@ public class MainTeleOp extends CommandOpMode {
 
     private Pose2D driveFieldRelative(double forward, double right, double rotate) {
         pinpoint.update();
-        Pose2D pos = pinpoint.getPosition();  // Current position
 
+        Pose2D pos = pinpoint.getPosition();  // Current position
+//
         double robotAngle = Math.toRadians(pos.getHeading(AngleUnit.DEGREES));
         double theta = Math.atan2(forward, right);
         double r = Math.hypot(forward, right);

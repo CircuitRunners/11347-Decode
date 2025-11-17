@@ -10,9 +10,12 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -23,17 +26,20 @@ import java.util.List;
 
 @Config
 @Configurable
-@Autonomous(name="Blue Side RUN WITH 1002 ONLY",group="Blue Autos", preselectTeleOp="MainTeleOp")
+@Autonomous(name="Blue Side 6 ball auto",group="Blue Autos", preselectTeleOp="MainTeleOp")
 public class BlueSideAlt extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
+    private int ballsToShoot;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
     private LimelightSubsystem limelight;
+    private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
+    private Thread outtakeThread;
 
     private boolean intaking, transfering, scoring, moving;
 
@@ -52,7 +58,7 @@ public class BlueSideAlt extends OpMode {
                                 new Pose(62.000, 14.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(114))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(113))
                 .build();
 
         line2 = follower.pathBuilder()
@@ -63,39 +69,45 @@ public class BlueSideAlt extends OpMode {
                                 new Pose(41.000, 35.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(114), Math.toRadians(180))
+                .setLinearHeadingInterpolation(Math.toRadians(113), Math.toRadians(180))
                 .build();
 
         line3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(41.000, 35.000), new Pose(11.000, 35.000)))
+                .addPath(new BezierLine(new Pose(41.000, 35.000), new Pose(8.500, 35.000)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
 
         line4 = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(40.000, 8.200),
+                                new Pose(8.500, 35.000),
                                 new Pose(56.800, 19.200),
                                 new Pose(62.000, 14.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(116))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(113))
                 .build();
 
         line5 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(53.500, 90.000), new Pose(42.000, 83.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+                .addPath(
+                        new BezierCurve(
+                                new Pose(62.000, 14.000),
+                                new Pose(56.300, 27.200),
+                                new Pose(41.000, 35.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(113), Math.toRadians(180))
                 .build();
-
-        line6 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(42.000, 83.000), new Pose(15.000, 83.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                .build();
-
-        line7 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(15.000, 83.000), new Pose(53.500, 90.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-                .build();
+//
+//        line6 = follower.pathBuilder()
+//                .addPath(new BezierLine(new Pose(42.000, 83.000), new Pose(15.000, 83.000)))
+//                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+//                .build();
+//
+//        line7 = follower.pathBuilder()
+//                .addPath(new BezierLine(new Pose(15.000, 83.000), new Pose(53.500, 90.000)))
+//                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+//                .build();
 //
 //        line8 = follower.pathBuilder()
 //                .addPath(new BezierLine(new Pose(43.000, 84.000), new Pose(44.000, 84.000)))
@@ -107,24 +119,24 @@ public class BlueSideAlt extends OpMode {
 //                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(135))
 //                .build();
 
-        line10 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(53.500, 90.000), new Pose(41.500, 58.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-                .build();
-
-        line11 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(41.500, 58.000), new Pose(12.000, 58.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                .build();
-
-        line12 = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        new Pose(12.000, 58.500),
-                        new Pose(42.000, 69.000),
-                        new Pose(53.500, 90.000)
-                ))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-                .build();
+//        line10 = follower.pathBuilder()
+//                .addPath(new BezierLine(new Pose(53.500, 90.000), new Pose(41.500, 58.000)))
+//                .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+//                .build();
+//
+//        line11 = follower.pathBuilder()
+//                .addPath(new BezierLine(new Pose(41.500, 58.000), new Pose(12.000, 58.000)))
+//                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+//                .build();
+//
+//        line12 = follower.pathBuilder()
+//                .addPath(new BezierCurve(
+//                        new Pose(12.000, 58.500),
+//                        new Pose(42.000, 69.000),
+//                        new Pose(53.500, 90.000)
+//                ))
+//                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+//                .build();
     }
 
     @Override
@@ -136,8 +148,11 @@ public class BlueSideAlt extends OpMode {
 
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
+        ballsToShoot = 3;
         out = new OuttakeSubsystem(hardwareMap);
         in = new IntakeSubsystem(hardwareMap);
+        intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 3);
+        outtakeBeamBreak = new BeamBreakHelper(hardwareMap, "outtakeBeamBreak", 0);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
@@ -167,6 +182,18 @@ public class BlueSideAlt extends OpMode {
 
     @Override
     public void start() {
+        outtakeThread = new Thread(() -> {
+            while (!Thread.interrupted()) {
+                outtakeBeamBreak.update();
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e) {
+                    break;
+                }
+            }
+        });
+
+        outtakeThread.start();
 
         pathTimer.resetTimer();
         setPathState(-2);
@@ -174,6 +201,7 @@ public class BlueSideAlt extends OpMode {
 
     @Override
     public void loop() {
+        intakeBeamBreak.update();
         follower.update();
         shooter.update();
         limelight.update();
@@ -191,6 +219,10 @@ public class BlueSideAlt extends OpMode {
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
         telemetry.addData("Shooter Velo: ", shooter.getShooterVelocity());
+        telemetry.addData("Balls Shot", outtakeBeamBreak.getBallCount());
+        telemetry.addData("Ball Held", intakeBeamBreak.getBallCount() % 3);
+        telemetry.addData("Balls to Shoot", ballsToShoot);
+        telemetry.addData("Outtake Raw", outtakeBeamBreak.isBeamBroken());
         telemetry.addData("Timer: ", pathTimer.getElapsedTimeSeconds());
         telemetry.addData("X", "%.2f", follower.getPose().getX());
         telemetry.addData("Y", "%.2f", follower.getPose().getY());
@@ -201,6 +233,10 @@ public class BlueSideAlt extends OpMode {
     @Override
     public void stop() {
         follower.breakFollowing();
+
+        if (outtakeThread != null) {
+            outtakeThread.interrupt();
+        }
     }
 
     private void setPathState(int newState) {
@@ -210,14 +246,16 @@ public class BlueSideAlt extends OpMode {
 
     private void autonomousPathUpdate() {
         switch (pathState) {
+            //Sets up before movement
             case -2:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(3450);
+                    shooter.setTargetRPM(3400);
                     out.aimScoring();
                     setPathState(0);
                 }
                 break;
 
+            //Starts movement
             case 0:
                 if (!follower.isBusy()) {
                     follower.followPath(line1);
@@ -226,8 +264,9 @@ public class BlueSideAlt extends OpMode {
                 }
                 break;
 
+            //Shoots balls until intake is empty and then resets intake count
             case -1:
-                if (shootTime.getElapsedTimeSeconds() < 7.5) {
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
                     } else if (shooter.getShooterVelocity() < 3200) {
@@ -236,20 +275,25 @@ public class BlueSideAlt extends OpMode {
                 } else {
                     stopTransfer();
                     out.block();
-                    out.aimClose();
+                    out.aimScoring();
                     intake();
+                    intakeBeamBreak.resetBallCount();
                     setPathState(1);
                 }
                 break;
 
+            //Makes sure intake has started, resets outtake count (in this case so that previous
+            // case doesn't get errors), and moves
             case 1:
                 if (!follower.isBusy()) {
                     intake();
+                    outtakeBeamBreak.resetBallCount();
                     follower.followPath(line2);
                     setPathState(2);
                 }
                 break;
 
+            //Moves to collect balls
             case 2:
                 if (!follower.isBusy()) {
                     follower.followPath(line3);
@@ -257,18 +301,27 @@ public class BlueSideAlt extends OpMode {
                 }
                 break;
 
+            //Moves to next score position and changes target RPM
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(3450);
+                    shooter.setTargetRPM(3400);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
                 break;
 
             case -4:
+                if (!intakeBeamBreak.isBeamStable()) {
+                    ballsToShoot = 3;
+                } else {
+//                    if (2 >= intakeBeamBreak.getBallCount()){
+//                        ballsToShoot = intakeBeamBreak.getBallCount();
+//                    }
+                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+                }
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 25) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         } else if (shooter.getShooterVelocity() < 3200) {
@@ -277,25 +330,28 @@ public class BlueSideAlt extends OpMode {
                     } else {
                         stopTransfer();
                         out.block();
+                        shooter.eStop();
 //                        intake();
-                        out.aimClose();
-//                        setPathState(4);
+                        intakeBeamBreak.resetBallCount();
+                        setPathState(4);
                     }
                 }
                 break;
 
             case 4:
                 if (!follower.isBusy()) {
-                    intake();
+//                    intake();
                     follower.followPath(line5);
                     setPathState(5);
+
                 }
                 break;
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.followPath(line6);
-                    setPathState(6);
+                    follower.pausePathFollowing();
+//                    follower.followPath(line6);
+//                    setPathState(6);
                 }
                 break;
 

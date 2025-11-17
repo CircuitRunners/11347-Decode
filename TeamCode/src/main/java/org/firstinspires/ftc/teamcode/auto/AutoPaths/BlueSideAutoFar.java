@@ -10,9 +10,11 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -21,6 +23,7 @@ import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
 
+@Disabled
 @Config
 @Configurable
 @Autonomous(name="Blue Side Auto",group="Blue Autos", preselectTeleOp="MainTeleOp")
@@ -34,6 +37,7 @@ public class BlueSideAutoFar extends OpMode {
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
     private LimelightSubsystem limelight;
+    private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
 
     private boolean intaking, transfering, scoring, moving;
 
@@ -138,6 +142,8 @@ public class BlueSideAutoFar extends OpMode {
         shooter.setTargetRPM(0);
         out = new OuttakeSubsystem(hardwareMap);
         in = new IntakeSubsystem(hardwareMap);
+        intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 3);
+        outtakeBeamBreak = new BeamBreakHelper(hardwareMap, "outtakeBeamBreak", 0);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
@@ -174,6 +180,8 @@ public class BlueSideAutoFar extends OpMode {
 
     @Override
     public void loop() {
+        intakeBeamBreak.update();
+        outtakeBeamBreak.update();
         follower.update();
         shooter.update();
         limelight.update();

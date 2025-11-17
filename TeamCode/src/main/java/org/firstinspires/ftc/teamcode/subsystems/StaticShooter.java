@@ -220,6 +220,6 @@ public class StaticShooter extends SubsystemBase {
     }
 
     public boolean isAtTargetThreshold() {
-        return ((getShooterVelocity() > (getTargetRPM() - 100)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
+        return ((getShooterVelocity() > (getTargetRPM() - 50)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
     }
 }
