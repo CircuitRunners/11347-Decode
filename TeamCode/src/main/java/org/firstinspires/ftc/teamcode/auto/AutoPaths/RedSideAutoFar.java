@@ -101,7 +101,7 @@ public class RedSideAutoFar extends OpMode {
                 .build();
 
         line11 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(102.500, 58.000), new Pose(132.000, 58.000)))
+                .addPath(new BezierLine(new Pose(102.500, 58.000), new Pose(136.000, 58.000)))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
 

@@ -120,7 +120,7 @@ public class BlueSideAutoFar extends OpMode {
                 .build();
 
         line11 = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(41.500, 58.000), new Pose(12.000, 58.000)))
+                .addPath(new BezierLine(new Pose(41.500, 58.000), new Pose(8.000, 58.000)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
 
