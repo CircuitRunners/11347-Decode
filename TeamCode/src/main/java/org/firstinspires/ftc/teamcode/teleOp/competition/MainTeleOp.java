@@ -160,7 +160,7 @@ public class MainTeleOp extends CommandOpMode {
                 pose.getHeading(AngleUnit.DEGREES)
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
+        driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new InstantCommand(()-> {
                     pinpoint.resetPosAndIMU();
                 }));
