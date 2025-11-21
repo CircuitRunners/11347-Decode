@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
-
+@Disabled
 @Config
 @Configurable
 @Autonomous(name="Blue Side 6 ball auto",group="Blue Autos", preselectTeleOp="MainTeleOp")

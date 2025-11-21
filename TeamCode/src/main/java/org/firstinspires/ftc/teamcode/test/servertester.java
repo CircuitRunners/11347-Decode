@@ -12,7 +12,7 @@ public class servertester extends OpMode {
     private Servo testServo;
     public static double position = 0.5;
     public static double INCREMENT = 0.01; // Amount to increment servo position
-    public static double MAX_POSITION = 0.35;  //right = 0.32
+    public static double MAX_POSITION = 100;  //right = 0.32
     private final double MIN_POSITION = 0.0;
     public static boolean reversed = false;
 

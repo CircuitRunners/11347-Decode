@@ -10,6 +10,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.Range;
 
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
-
+@Disabled
 @Config
 @Configurable
 @Autonomous(name="SMART Blue Side Auto",group="Blue Autos", preselectTeleOp="MainTeleOp")
