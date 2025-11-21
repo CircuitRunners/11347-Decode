@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
 import java.util.Locale;
+import java.lang.Math;
 
 @Config
 @TeleOp(group="1")
@@ -192,13 +193,24 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
         telemetry.addData("Beam Break State: ", beamBreak.getBeamState());
         telemetry.addData("RGB Colour", rgbHelper.getCurrentColour());
-        telemetry.addLine();
+        telemetry.addLine(); 
         telemetry.addLine("----  Pinpoint Data  ----");
         telemetry.addData("Position", data);
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
         telemetry.addData("Soft limit On?", aimServoLimit);
         telemetry.update();
+    }
+    private double thetha(){
+        double y = getDistanceToTagCenterInches(true);
+        //diameter of flywheel is 96mm
+        double g =9.81;
+        double height = 0.664;
+        constant cons = 0.96; //this is the constant that will need to be higher or lower
+        double k = (cons*Math.PI)/60;
+        double vnot = 0;
+        double angle = Math.arctan(((vnot)^2+Math.sqrt((vnot)^4-(2*g*(vnot)^2) - ((g^2)*y^2)))/(g*y));
+
     }
 
     private Pose2D driveFieldRelative(double forward, double right, double rotate) {

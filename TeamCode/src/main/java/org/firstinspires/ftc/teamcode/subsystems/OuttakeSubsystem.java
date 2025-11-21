@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.support.RunAction;
 
+import java.lang.Math;
+
 public class OuttakeSubsystem extends SubsystemBase {
     // === Enums ===
     public enum BlockState {
@@ -100,6 +102,7 @@ public class OuttakeSubsystem extends SubsystemBase {
         setAim(0.205);
     }
 
+
     public void aimClose() {
         setAim(0.162);
     }
@@ -117,4 +120,16 @@ public class OuttakeSubsystem extends SubsystemBase {
             aimingServo.setPosition(Range.clip(currentPos+0.005, 0, 04.5));
         }
     }
+
+    public void changeHood(double theta) {
+        
+
+        double finalPos = (theta/90)*0.48;
+        setAim(finalPos);
+
+
+        
+
+    }
 }
+
