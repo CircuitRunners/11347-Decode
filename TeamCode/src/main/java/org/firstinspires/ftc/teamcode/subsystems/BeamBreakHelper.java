@@ -73,7 +73,7 @@ public class BeamBreakHelper extends SubsystemBase {
         return stableBroken;
     }
 
-    public int getBallCount() {
+    public synchronized int getBallCount() {
         return ballCount;
     }
 

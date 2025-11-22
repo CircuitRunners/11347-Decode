@@ -31,6 +31,7 @@ public class BlueSideAutoFar extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
+    private int ballsToShoot;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
@@ -41,7 +42,8 @@ public class BlueSideAutoFar extends OpMode {
     private boolean intaking, transfering, scoring, moving;
 
     private boolean headingLockEnabled;
-
+    private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
+    private Thread outtakeThread;
     private final Pose startPose = new Pose(40.0, 8.2, Math.toRadians(180));
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8;
@@ -136,11 +138,13 @@ public class BlueSideAutoFar extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
+        ballsToShoot = 3;
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
         out = new OuttakeSubsystem(hardwareMap);
         in = new IntakeSubsystem(hardwareMap);
+        intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 3);
+        outtakeBeamBreak = new BeamBreakHelper(hardwareMap, "outtakeBeamBreak", 0);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
         AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
@@ -170,13 +174,25 @@ public class BlueSideAutoFar extends OpMode {
 
     @Override
     public void start() {
+        outtakeThread = new Thread(() -> {
+            while (!Thread.interrupted()) {
+                outtakeBeamBreak.update();
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e) {
+                    break;
+                }
+            }
+        });
 
+        outtakeThread.start();
         pathTimer.resetTimer();
         setPathState(-2);
     }
 
     @Override
     public void loop() {
+        intakeBeamBreak.update();
         follower.update();
         shooter.update();
         limelight.update();
@@ -194,6 +210,10 @@ public class BlueSideAutoFar extends OpMode {
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
         telemetry.addData("Shooter Velo: ", shooter.getShooterVelocity());
+        telemetry.addData("Balls Shot", outtakeBeamBreak.getBallCount());
+        telemetry.addData("Ball Held", intakeBeamBreak.getBallCount() % 3);
+        telemetry.addData("Balls to Shoot", ballsToShoot);
+        telemetry.addData("Outtake Raw", outtakeBeamBreak.isBeamBroken());
         telemetry.addData("Timer: ", pathTimer.getElapsedTimeSeconds());
         telemetry.addData("X", "%.2f", follower.getPose().getX());
         telemetry.addData("Y", "%.2f", follower.getPose().getY());
@@ -203,7 +223,11 @@ public class BlueSideAutoFar extends OpMode {
 
     @Override
     public void stop() {
+
         follower.breakFollowing();
+        if (outtakeThread != null) {
+            outtakeThread.interrupt();
+        }
     }
 
     private void setPathState(int newState) {
@@ -231,7 +255,8 @@ public class BlueSideAutoFar extends OpMode {
                 break;
 
             case -1:
-                if (shootTime.getElapsedTimeSeconds() < 8) {
+
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && shootTime.getElapsedTimeSeconds() < 8) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
                     } else if (shooter.getShooterVelocity() < 3100) {
@@ -241,6 +266,7 @@ public class BlueSideAutoFar extends OpMode {
                     stopTransfer();
                     out.block();
                     intake();
+                    intakeBeamBreak.resetBallCount();
                     setPathState(1);
                 }
                 break;
@@ -273,8 +299,18 @@ public class BlueSideAutoFar extends OpMode {
                 break;
 
             case -4:
+
+
+                if (intakeBeamBreak.isBeamStable()) {
+                    ballsToShoot = 3;
+                } else {
+//                    if (2 >= intakeBeamBreak.getBallCount()){
+//                        ballsToShoot = intakeBeamBreak.getBallCount();
+//                    }
+                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+                }
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 18) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && shootTime.getElapsedTimeSeconds() < 18) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         } else if (shooter.getShooterVelocity() < 3100) {
@@ -284,6 +320,7 @@ public class BlueSideAutoFar extends OpMode {
                         stopTransfer();
                         out.block();
                         intake();
+                        intakeBeamBreak.resetBallCount();
                         setPathState(4);
                     }
                 }
@@ -329,8 +366,13 @@ public class BlueSideAutoFar extends OpMode {
 //                break;
 
             case -9:
+                if (intakeBeamBreak.isBeamStable()) {
+                    ballsToShoot = 3;
+                } else {
+                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+                }
                 if (!follower.isBusy()) {
-                    if (shootTime.getElapsedTimeSeconds() < 28.5) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && shootTime.getElapsedTimeSeconds() < 28.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         } else if (shooter.getShooterVelocity() < 3100) {
@@ -340,6 +382,7 @@ public class BlueSideAutoFar extends OpMode {
                         stopTransfer();
                         out.block();
                         intake();
+                        intakeBeamBreak.resetBallCount();
                         setPathState(9);
                     }
                 }
