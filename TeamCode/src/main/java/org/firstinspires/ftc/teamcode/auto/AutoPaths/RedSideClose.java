@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
-
-public class RedSideClose {
-}
+//package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+//
+//public class RedSideClose {
+//}
