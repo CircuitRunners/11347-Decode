@@ -21,7 +21,7 @@ public class BeamBreakHelper extends SubsystemBase {
     private boolean seenClear = false;     // <-- FIX #1
     private int ballCount = 0;
 
-    public static double BALL_TIMEOUT = 0.5;
+    public static double BALL_TIMEOUT = 0.3;
     private final ElapsedTime timeoutTimer = new ElapsedTime();
     private boolean inTimeout = false;
 
