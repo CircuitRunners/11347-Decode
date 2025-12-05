@@ -9,10 +9,9 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
@@ -23,11 +22,11 @@ import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
-
+@Disabled
 @Config
 @Configurable
-@Autonomous(name="Red Side Auto Close TEST TEST TEST NOT DONE",group="Red Autos", preselectTeleOp="MainTeleOp")
-public class TEST9BallCloseRedAuto extends OpMode {
+@Autonomous(name="Red Side Auto Close 12",group="Red Autos", preselectTeleOp="MainTeleOp")
+public class RedSideClose12 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
@@ -44,7 +43,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
     private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(104.0, 135.5, Math.toRadians(0));
+    private final Pose startPose = new Pose(110.0, 135.5, Math.toRadians(0));
 
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8, line9, line10, line11, line12, line13;
@@ -53,7 +52,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line1 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(104.000, 135.500), new Pose(100.000, 100.000))
+                        new BezierLine(new Pose(110.00, 135.500), new Pose(100.000, 100.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
                 .build();
@@ -69,7 +68,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line3 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(97.000, 84.000), new Pose(124.000, 84.000))
+                        new BezierLine(new Pose(97.000, 84.000), new Pose(125.000, 84.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -78,9 +77,9 @@ public class TEST9BallCloseRedAuto extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(124.000, 84.000),
+                                new Pose(125.000, 84.000),
                                 new Pose(120.000, 78.000),//80
-                                new Pose(118.000, 75.000)
+                                new Pose(119.500, 75.000)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -89,7 +88,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line5 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(118.000, 75.000), new Pose(125.000, 75.000))
+                        new BezierLine(new Pose(119.500, 75.000), new Pose(125.000, 75.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -113,7 +112,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line8 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(97.000, 60.000), new Pose(132.000, 60.000))
+                        new BezierLine(new Pose(97.000, 60.000), new Pose(133.500, 60.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -122,7 +121,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(132.000, 60.000),
+                                new Pose(133.500, 60.000),
                                 new Pose(98.000, 64.000),//80
                                 new Pose(100.000, 100.000)
                         )
@@ -143,7 +142,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line11 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(97.000, 35.000), new Pose(132.000, 36.000))
+                        new BezierLine(new Pose(97.000, 35.000), new Pose(133.500, 36.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -151,7 +150,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
         line12 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(132.000, 36.000), new Pose(100.000, 100.000))
+                        new BezierLine(new Pose(133.500, 36.000), new Pose(100.000, 100.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
                 .build();
@@ -274,9 +273,9 @@ public class TEST9BallCloseRedAuto extends OpMode {
         switch (pathState) {
             case -2:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.87);
                     shooter.setTargetRPM(2600);
-                    out.setAim(0.16);
+                    out.setAim(0.135);
                     setPathState(0);
                 }
                 break;
@@ -326,6 +325,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
                 if (!follower.isBusy()) {
                     //stopIntake();
                     shooter.setTargetRPM(2600);
+                    follower.setMaxPower(0.67);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
@@ -340,7 +340,7 @@ public class TEST9BallCloseRedAuto extends OpMode {
 
             case 4:
                 if (!follower.isBusy()) {
-
+                    follower.setMaxPower(0.87);
                     follower.followPath(line6);
                     setPathState(5);
                 }
