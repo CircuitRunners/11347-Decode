@@ -206,7 +206,7 @@ public class RedSideAlt2 extends OpMode {
         limelight.update();
         autonomousPathUpdate();
 
-        if (shootTime.getElapsedTimeSeconds() > 28) {
+        if (pathState != 9 && shootTime.getElapsedTimeSeconds() > 28) {
             setPathState(9);
         }
 
@@ -272,7 +272,7 @@ public class RedSideAlt2 extends OpMode {
                 if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3250) {
+                    } else if (shooter.getShooterVelocity() < 3150) {
                         stopTransfer();
                     }
                 } else {
@@ -327,7 +327,7 @@ public class RedSideAlt2 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3200) {
+                        } else if (shooter.getShooterVelocity() < 3150) {
                             stopTransfer();
                         }
                     } else {
@@ -391,7 +391,7 @@ public class RedSideAlt2 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3200) {
+                        } else if (shooter.getShooterVelocity() < 3150) {
                             stopTransfer();
                         }
                     } else {

@@ -29,7 +29,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public enum AimState {
-        AIM_MAX(0.25),
+        AIM_MAX(0.23),
         AIM_MIN(0.00);
 
         public final double position;
