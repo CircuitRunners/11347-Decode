@@ -12,8 +12,10 @@ public class RedAutos extends SelectableOpMode {
 
     public RedAutos() {
         super("Select an Auto", s -> {
-            s.add("Red Far Auto", RedSideAutoFar::new);
+            s.add("Red Far Auto 9 (Observation Zone)", RedSideAutoFar9::new);
+            s.add("Red Far Auto 9 (Middle)", RedSideAlt2::new);
             s.add("Red Close Auto 9", RedSideClose9::new);
             s.add("Red Close Auto 12", RedSideClose12::new);
         });
-        }}
+    }
+}

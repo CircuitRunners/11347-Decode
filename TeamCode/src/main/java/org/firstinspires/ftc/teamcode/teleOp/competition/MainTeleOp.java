@@ -6,7 +6,6 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -27,11 +26,6 @@ import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-
 import java.util.Locale;
 
 @Config
@@ -47,9 +41,6 @@ public class MainTeleOp extends CommandOpMode {
     private GobildaRGBIndicatorHelper rgbHelper;
     private BeamBreakHelper intakeBeamBreak;
     private boolean aimServoLimit = true;
-    private int transferHoodRPM = 0;
-    private double transferServoAngle = 0.25;
-    private Timer pathTimer;
 
     // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
@@ -77,8 +68,7 @@ public class MainTeleOp extends CommandOpMode {
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
         rgbHelper = new GobildaRGBIndicatorHelper(hardwareMap);
         intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 0);
-        pathTimer = new Timer();
-        pathTimer.resetTimer();
+
 
         // Default Commands
         // Intake Command
@@ -89,7 +79,6 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
                     shooter.setTargetRPM(3400);
-                    transferHoodRPM = 3400;
                     out.aimScoring();
                 }));
 
@@ -97,7 +86,7 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
                     shooter.setTargetRPM(2500);
-                    out.setAim(0.16);
+                    out.aimClose();
                 }));
 
         manipulator.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
@@ -118,35 +107,11 @@ public class MainTeleOp extends CommandOpMode {
         // Transfering Command
         // Click to toggle on and off transfering
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new TransferCommand(in, out, driver),
-
-                                new InstantCommand(()-> {
-                                    if (shooter.getTargetRPM() == 3400){
-                                        transferHoodRPM = Range.clip(transferHoodRPM + 150, 0, 3550);
-//                                        transferServoAngle = Range.clip(transferServoAngle+0.003, 0, 0.28);
-                                        shooter.setTargetRPM((transferHoodRPM));
-                                        //out.setAim(transferServoAngle);
-                                        pathTimer.resetTimer();
-                                }
-                                })
-          )
-      )
-                .whenReleased(
-                        new InstantCommand(()-> {
-                            if (shooter.getTargetRPM() >= 3200 && pathTimer.getElapsedTimeSeconds()>2) {
-                                transferHoodRPM = 3200;
-                                shooter.setTargetRPM((transferHoodRPM));
-//                                transferServoAngle = 0.25;
-//                                out.setAim(transferServoAngle);
-                            }
-                        })
-      );;
+                .whenPressed(new TransferCommand(in, out, driver));
 
         //Heading Lock
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                        .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
+                .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
 
         telemetry.addLine("ROBOT READY!");
         telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
