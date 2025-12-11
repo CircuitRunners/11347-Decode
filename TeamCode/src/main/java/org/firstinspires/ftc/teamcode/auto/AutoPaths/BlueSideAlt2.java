@@ -253,7 +253,7 @@ public class BlueSideAlt2 extends OpMode {
             //Sets up before movement
             case -2:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(3300);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -273,7 +273,7 @@ public class BlueSideAlt2 extends OpMode {
                 if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3150) {
+                    } else if (shooter.getShooterVelocity() < 3000) {
                         stopTransfer();
                     }
                 } else {
@@ -309,7 +309,7 @@ public class BlueSideAlt2 extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(3300);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
@@ -328,7 +328,7 @@ public class BlueSideAlt2 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3150) {
+                        } else if (shooter.getShooterVelocity() < 3000) {
                             stopTransfer();
                         }
                     } else {
@@ -360,7 +360,7 @@ public class BlueSideAlt2 extends OpMode {
             case 6:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(3300);
                     follower.followPath(line7);
                     setPathState(-9);
                 }
@@ -392,7 +392,7 @@ public class BlueSideAlt2 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3150) {
+                        } else if (shooter.getShooterVelocity() < 3000) {
                             stopTransfer();
                         }
                     } else {

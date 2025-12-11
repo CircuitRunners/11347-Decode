@@ -281,7 +281,7 @@ public class BlueSideClose9 extends OpMode {
                 if (!follower.isBusy()) {
                     follower.setMaxPower(0.87);
                     shooter.setTargetRPM(2600);
-                    out.setAim(0.16);
+                    out.aimClose();
                     setPathState(0);
                 }
                 break;

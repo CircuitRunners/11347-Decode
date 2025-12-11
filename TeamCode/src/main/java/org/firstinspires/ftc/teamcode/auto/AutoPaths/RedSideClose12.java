@@ -32,6 +32,8 @@ public class RedSideClose12 extends OpMode {
     private int pathState = 0;
     private int ballsToShoot;
 
+    private int CLOSE_SHOOTER_POWER = 3900;
+
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
@@ -79,7 +81,7 @@ public class RedSideClose12 extends OpMode {
                         new BezierCurve(
                                 new Pose(125.000, 84.000),
                                 new Pose(120.000, 78.000),//80
-                                new Pose(119.500, 75.000)
+                                new Pose(119.500, 77.000)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -88,7 +90,7 @@ public class RedSideClose12 extends OpMode {
         line5 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(119.500, 75.000), new Pose(125.000, 75.000))
+                        new BezierLine(new Pose(119.500, 77.000), new Pose(125.000, 77.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
@@ -96,7 +98,7 @@ public class RedSideClose12 extends OpMode {
         line6 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(129.000, 75.000), new Pose(100.000, 100.000))
+                        new BezierLine(new Pose(129.000, 77.000), new Pose(100.000, 100.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
                 .build();
@@ -274,8 +276,8 @@ public class RedSideClose12 extends OpMode {
             case -2:
                 if (!follower.isBusy()) {
                     follower.setMaxPower(0.87);
-                    shooter.setTargetRPM(2600);
-                    out.setAim(0.135);
+                    shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
+                    out.aimClose();
                     setPathState(0);
                 }
                 break;
@@ -291,7 +293,7 @@ public class RedSideClose12 extends OpMode {
             case -1:
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 9) {
-                        if (shooter.getShooterVelocity() >= 2300) {
+                        if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
                     } else {
@@ -324,7 +326,7 @@ public class RedSideClose12 extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     //stopIntake();
-                    shooter.setTargetRPM(2600);
+                    shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                     follower.setMaxPower(0.67);
                     follower.followPath(line4);
                     setPathState(-4);
@@ -357,7 +359,7 @@ public class RedSideClose12 extends OpMode {
 //                }
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.getShooterVelocity() >= 200) {
+                        if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
                     } else {
@@ -388,7 +390,7 @@ public class RedSideClose12 extends OpMode {
                 break;
 
             case 8:
-                shooter.setTargetRPM(2600);
+                shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                 if (!follower.isBusy()) {
                     follower.followPath(line9);
                     setPathState(-9);
@@ -403,7 +405,7 @@ public class RedSideClose12 extends OpMode {
 //                }
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.getShooterVelocity() >= 200) {
+                        if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
                     } else {
@@ -448,7 +450,7 @@ public class RedSideClose12 extends OpMode {
             case 12:
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.getShooterVelocity() >= 200) {
+                        if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
                     } else {

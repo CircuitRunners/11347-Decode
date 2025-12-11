@@ -25,9 +25,9 @@ public class StaticShooter extends SubsystemBase {
 
     // --- Shooter Constants ---
     private static double TARGET_RPM = 3500.0;         // desired shooter RPM
-    private static double MOTOR_RPM = 1620.0;          // motor RPM (based on max motor rpm)
-    private static double GEAR_RATIO = 2.5;            // gear ratio from motor to shooter
-    private static double TICKS_PER_REV = 103.8;       // motor encoder ticks per revolution
+    private static double MOTOR_RPM = 6000.0;          // motor RPM (based on max motor rpm)
+    private static double GEAR_RATIO = (1/1.448275);            // gear ratio from motor to shooter
+    private static double TICKS_PER_REV = 28;       // motor encoder ticks per revolution
     private boolean active;
 
     // --- PIDF Coefficients ---
@@ -36,10 +36,10 @@ public class StaticShooter extends SubsystemBase {
     public double kI = 0.0;
     public double kD = 10.0;
     public double kF = 13.0;*/
-    public static double kP = 35.0;
+    public static double kP = 6; // 35
     public static double kI = 0.0;
-    public static double kD = 10.0;
-    public static double kF = 13.0;
+    public static double kD = 5; // 10
+    public static double kF = 8; // 13
 
     /**
      * Initialises the shooter in the hardwareMap, sets default shooter values
@@ -182,7 +182,9 @@ public class StaticShooter extends SubsystemBase {
      * Sets the target velocity
      * */
     public void update() {
-        double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
+//        double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
+        double targetMotorRPM = TARGET_RPM / GEAR_RATIO;
+        double targetTicksPerSec = (targetMotorRPM * TICKS_PER_REV) / 60.0;
         shooter.setVelocity(targetTicksPerSec);
 
         active = Math.abs(getTargetRPM()) > 0;
@@ -202,9 +204,10 @@ public class StaticShooter extends SubsystemBase {
     public double getShooterVelocity() {
         double currTicksPerSec = shooter.getVelocity(); // ticks/s of motor
         double currMotorRPM = (currTicksPerSec * 60.0) / TICKS_PER_REV;
-        double currShooterRPM = currMotorRPM * GEAR_RATIO;
-
-        return currShooterRPM;
+//        double currShooterRPM = currMotorRPM * GEAR_RATIO;
+//
+//        return currShooterRPM;
+        return currMotorRPM;
     }
 
     /**
@@ -220,6 +223,6 @@ public class StaticShooter extends SubsystemBase {
     }
 
     public boolean isAtTargetThreshold() {
-        return ((getShooterVelocity() > (getTargetRPM() - 50)) && (getShooterVelocity() < (getTargetRPM() + 100)) && getShooterVelocity() != 0);
+        return ((getShooterVelocity() > (getTargetRPM() - 200)) && getShooterVelocity() != 0);
     }
 }

@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  * Only add kI if you see steady-state error that kF+kP can’t fix, prob won't be needed
  * Add kD to damp oscillations during spin-up, might not be needed
  */
-@Disabled
+//@Disabled
 @Config
 @TeleOp
 public class ShooterPIDTest extends CommandOpMode {
@@ -26,16 +26,16 @@ public class ShooterPIDTest extends CommandOpMode {
 
     // Dashboard-tunable constants
     public static double TARGET_RPM = 3500.0; // 4000
-    public static double MOTOR_RPM = 1620.0; // 1410
-    public static double GEAR_RATIO = 2.5;
-    public static double TICKS_PER_REV = 103.8;
+    public static double MOTOR_RPM = 6000.0; // 1410
+    public static double GEAR_RATIO = (1/1.448275);
+    public static double TICKS_PER_REV = 28;
 
 
     // PIDF (velocity)
-    public static double kP = 35.0; //15.0
+    public static double kP = 0;
     public static double kI = 0.0;
-    public static double kD = 10.0;
-    public static double kF = 13.0; //13.7
+    public static double kD = 0;
+    public static double kF = 0;
 
     public double kfValue;
 

@@ -32,6 +32,8 @@ public class BlueSideAutoFar9 extends OpMode {
     private int pathState = 0;
     private int ballsToShoot;
 
+    private int FAR_SHOOTER_POWER = 4900;
+
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
@@ -52,7 +54,7 @@ public class BlueSideAutoFar9 extends OpMode {
                 .addPath(
                         new BezierCurve(
                                 new Pose(40.000, 8.200),
-                                new Pose(56.000, 19.200),
+                                new Pose(43.000, 22.200),
                                 new Pose(55.00, 14.00)
                         )
                 )
@@ -209,6 +211,7 @@ public class BlueSideAutoFar9 extends OpMode {
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
         telemetry.addData("Shooter Velo: ", shooter.getShooterVelocity());
+        telemetry.addData("At threshold?", shooter.isActive());
         telemetry.addData("Balls Shot", outtakeBeamBreak.getBallCount());
         telemetry.addData("Ball Held", intakeBeamBreak.getBallCount() % 3);
         telemetry.addData("Balls to Shoot", ballsToShoot);
@@ -239,7 +242,7 @@ public class BlueSideAutoFar9 extends OpMode {
             case -2:
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1);
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -291,8 +294,8 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 3:
                 if (!follower.isBusy()) {
-                    //stopIntake();
-                    shooter.setTargetRPM(3400);
+//                    stopIntake();
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.setMaxPower(1);
                     follower.followPath(line4);
                     setPathState(-4);
@@ -300,8 +303,6 @@ public class BlueSideAutoFar9 extends OpMode {
                 break;
 
             case -4:
-
-
 //                if (intakeBeamBreak.isBeamStable()) {
 //                    ballsToShoot = 3;
 //                } else {
@@ -348,9 +349,9 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    //stopIntake();
+//                    stopIntake();
                     follower.setMaxPower(0.8);
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     ballsToShoot = 3;
                     follower.followPath(line7);
                     setPathState(-9);
@@ -396,6 +397,7 @@ public class BlueSideAutoFar9 extends OpMode {
             case 9:
                 if (!follower.isBusy()) {
                     shooter.eStop();
+                    stopIntake();
 
                     follower.followPath(line8);
 

@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
-@Disabled
+//@Disabled
 @Config
 @Configurable
 @Autonomous(name="Red Side Far 9 ball auto", group="Red Autos", preselectTeleOp="MainTeleOp")
