@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.RedAutos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -10,156 +10,149 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 
 import java.util.List;
-
+//@Disabled
 @Config
 @Configurable
-@Autonomous(name="Blue Side Auto Far",group="Blue Autos", preselectTeleOp="MainTeleOp")
-public class BlueSideAutoFar9 extends OpMode {
+@Autonomous(name="Red Side Far 9 ball auto", group="Red Autos", preselectTeleOp="MainTeleOp")
+public class RedSideAlt2 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
-
-    private int FAR_SHOOTER_POWER = 4900;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
     private OuttakeSubsystem out;
     private LimelightSubsystem limelight;
-
-    private boolean intaking, transfering, scoring, moving;
-
-    private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(40.0, 8.2, Math.toRadians(180));
+
+    private boolean intaking, transfering, scoring, moving;
+    private boolean headingLockEnabled;
+
+    private final Pose startPose = new Pose(104.0, 8.2, Math.toRadians(0));
     private PathChain line1, line2, line3, line4, line5, line6,
-            line7, line8, line9, line10;
+            line7, line8, line9, line10, line11, line12;
+
     public void buildPaths() {
-        line1 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(40.000, 8.200),
-                                new Pose(43.000, 22.200),
-                                new Pose(55.00, 14.00)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(113.5))
+        line1 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(104.000, 8.200),
+                        new Pose(110.200, 22.200),
+                        new Pose(90.000, 14.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(66.5))
                 .build();
 
-        line2 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(55.00, 14.000),
-                                new Pose(56.300, 27.200),
-                                new Pose(41.000, 35.000)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(113.5), Math.toRadians(180))
+        line2 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(89.000, 14.000),
+                        new Pose(87.700, 27.200),
+                        new Pose(103.000, 35.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(66.5), Math.toRadians(0))
                 .build();
 
-        line3 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierLine(new Pose(41.000, 35.000), new Pose(8.000, 35.000))
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+        line3 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Pose(103.000, 35.000),
+                        new Pose(134.500, 35.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
 
-        line4 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(8.000, 35.000),
-                                new Pose(45.000, 35.000),
-                                new Pose(55.000, 14.000)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(113.5))
+        line4 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(134.500, 35.000),
+                        new Pose(80.000, 48.000),
+                        new Pose(89, 14)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(66.5))
                 .build();
 
-        line5 = follower //starts here
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(55.000, 14.000),
-                                new Pose(35.000, 20.000),
-                                new Pose(25.000, 14.000)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(113.5), Math.toRadians(180))
+        line5 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(89.000, 14.000),
+                        new Pose(87.700, 27.200),
+                        new Pose(103.000, 59.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(66.5), Math.toRadians(0))
                 .build();
 
-        line6 = follower //goes forward
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(25.000, 14.000), new Pose(9.000, 14.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+        line6 = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Pose(103.000, 59.000),
+                        new Pose(134.500, 59.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
 
-        line7 = follower //goes back
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(9.000, 14.000), new Pose(25.000, 9.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+        line7 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(134.500, 59.000),
+                        new Pose(80.000, 48.000),
+                        new Pose(89.000, 14.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(66.5))
                 .build();
 
-        line8 = follower //goes forward
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(25.000, 9.000), new Pose(9.000, 9.000)))
-                .setTangentHeadingInterpolation()
+        line10 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Pose(89.000, 14.000),
+                        new Pose(87.700, 27.200),
+                        new Pose(103.000, 35.000)
+                ))
+                .setLinearHeadingInterpolation(Math.toRadians(66.5), Math.toRadians(0))
                 .build();
-
-        line9 = follower //shooting position
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(9.000, 9.000),
-                                new Pose(20.000, 30.000),
-                                new Pose(55.000, 14.000)
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(113.5))
-                .build();
-
-        line10 = follower //park
-                .pathBuilder()
-                .addPath(
-                        new BezierLine(new Pose(55.000, 14.000), new Pose(35.000, 15.000))
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(113.5), Math.toRadians(0))
-                .build();
+//
+//        line11 = follower.pathBuilder()
+//                .addPath(new BezierLine(
+//                        new Pose(102.500, 58.000),
+//                        new Pose(132.000, 58.000)
+//                ))
+//                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+//                .build();
+//
+//        line12 = follower.pathBuilder()
+//                .addPath(new BezierCurve(
+//                        new Pose(132.000, 58.500),
+//                        new Pose(102.000, 69.000),
+//                        new Pose(90.500, 90.000)
+//                ))
+//                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+//                .build();
     }
 
 
-        @Override
+    @Override
     public void init() {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-        ballsToShoot = 3;
+
         shooter = new StaticShooter(hardwareMap, telemetry);
         shooter.setTargetRPM(0);
+        ballsToShoot = 3;
         out = new OuttakeSubsystem(hardwareMap);
         in = new IntakeSubsystem(hardwareMap);
         intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 3);
         outtakeBeamBreak = new BeamBreakHelper(hardwareMap, "outtakeBeamBreak", 0);
         limelight = new LimelightSubsystem(hardwareMap, "limelight");
-        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
+        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.RED.getTagId());
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
 
         follower = Constants.createFollower(hardwareMap);
@@ -171,7 +164,7 @@ public class BlueSideAutoFar9 extends OpMode {
         pathTimer = new Timer();
         pathTimer.resetTimer();
 
-        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.BLUE.getTagId());
+        AlliancePresets.setAllianceShooterTag(AlliancePresets.Alliance.RED.getTagId());
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -199,6 +192,7 @@ public class BlueSideAutoFar9 extends OpMode {
         });
 
         outtakeThread.start();
+
         pathTimer.resetTimer();
         setPathState(-2);
     }
@@ -210,6 +204,10 @@ public class BlueSideAutoFar9 extends OpMode {
         shooter.update();
         limelight.update();
         autonomousPathUpdate();
+
+        if (pathState != 9 && shootTime.getElapsedTimeSeconds() > 28) {
+            setPathState(9);
+        }
 
 //        if (headingLockEnabled && limelight.hasValidTarget()) {
 //            LLResult result = limelight.getLatest();
@@ -223,7 +221,6 @@ public class BlueSideAutoFar9 extends OpMode {
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
         telemetry.addData("Shooter Velo: ", shooter.getShooterVelocity());
-        telemetry.addData("At threshold?", shooter.isActive());
         telemetry.addData("Balls Shot", outtakeBeamBreak.getBallCount());
         telemetry.addData("Ball Held", intakeBeamBreak.getBallCount() % 3);
         telemetry.addData("Balls to Shoot", ballsToShoot);
@@ -237,8 +234,8 @@ public class BlueSideAutoFar9 extends OpMode {
 
     @Override
     public void stop() {
-
         follower.breakFollowing();
+
         if (outtakeThread != null) {
             outtakeThread.interrupt();
         }
@@ -251,15 +248,16 @@ public class BlueSideAutoFar9 extends OpMode {
 
     private void autonomousPathUpdate() {
         switch (pathState) {
+            //Sets up before movement
             case -2:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(1);
-                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
+                    shooter.setTargetRPM(3400);
                     out.aimScoring();
                     setPathState(0);
                 }
                 break;
 
+            //Starts movement
             case 0:
                 if (!follower.isBusy()) {
                     follower.followPath(line1);
@@ -268,74 +266,74 @@ public class BlueSideAutoFar9 extends OpMode {
                 }
                 break;
 
+            //Shoots balls until intake is empty and then resets intake count
             case -1:
-
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7) {
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3100) {
+                    } else if (shooter.getShooterVelocity() < 3150) {
                         stopTransfer();
                     }
                 } else {
                     stopTransfer();
                     out.block();
+                    out.aimScoring();
                     intake();
-                    outtakeBeamBreak.resetBallCount();
+                    intakeBeamBreak.resetBallCount();
                     setPathState(1);
                 }
                 break;
 
+            //Makes sure intake has started, resets outtake count (in this case so that previous
+            // case doesn't get errors), and moves
             case 1:
                 if (!follower.isBusy()) {
                     intake();
-                    follower.setMaxPower(1);
+                    outtakeBeamBreak.resetBallCount();
                     follower.followPath(line2);
                     setPathState(2);
                 }
                 break;
 
+            //Moves to collect balls
             case 2:
                 if (!follower.isBusy()) {
-                    //follower.setMaxPower(1);
-                    ballsToShoot = 3;
                     follower.followPath(line3);
                     setPathState(3);
                 }
                 break;
 
-
+            //Moves to next score position and changes target RPM
             case 3:
                 if (!follower.isBusy()) {
-//                    stopIntake();
-                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
-                    follower.setMaxPower(1);
+                    stopIntake();
+                    shooter.setTargetRPM(3400);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
                 break;
 
             case -4:
-//                if (intakeBeamBreak.isBeamStable()) {
-//                    ballsToShoot = 3;
-//                } else {
-////                    if (2 >= intakeBeamBreak.getBallCount()){
-////                        ballsToShoot = intakeBeamBreak.getBallCount();
-////                    }
-//                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-//                }
+                if (!intakeBeamBreak.isBeamStable()) {
+                    ballsToShoot = 3;
+                } else {
+//                    if (2 >= intakeBeamBreak.getBallCount()){
+//                        ballsToShoot = intakeBeamBreak.getBallCount();
+//                    }
+                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+                }
                 if (!follower.isBusy()) {
-                    //&& shootTime.getElapsedTimeSeconds() < 18
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 5)) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < 3150) {
                             stopTransfer();
                         }
                     } else {
                         stopTransfer();
                         out.block();
                         intake();
-                        outtakeBeamBreak.resetBallCount();
+                        intakeBeamBreak.resetBallCount();
                         setPathState(4);
                     }
                 }
@@ -344,7 +342,7 @@ public class BlueSideAutoFar9 extends OpMode {
             case 4:
                 if (!follower.isBusy()) {
                     intake();
-                    follower.setMaxPower(0.7); //0.7
+                    outtakeBeamBreak.resetBallCount();
                     follower.followPath(line5);
                     setPathState(5);
                 }
@@ -352,56 +350,54 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.7); //0.7
                     follower.followPath(line6);
                     setPathState(6);
                 }
-
                 break;
 
             case 6:
                 if (!follower.isBusy()) {
-//                    stopIntake();
-                    follower.setMaxPower(0.8); //0.8
-                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
-                    ballsToShoot = 3;
+                    stopIntake();
+                    shooter.setTargetRPM(3400);
                     follower.followPath(line7);
-                    setPathState(7);
-                }
-                break;
-
-            case 7:
-                if (!follower.isBusy()) {
-                    follower.followPath(line8);
-                    setPathState(8);
-                }
-                break;
-
-            case 8:
-                if (!follower.isBusy()) {
-                    follower.followPath(line9);
                     setPathState(-9);
                 }
                 break;
 
-            case -9:
-//                if (intakeBeamBreak.isBeamStable()) {
-//                    ballsToShoot = 3;
-//                } else {
-//                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+//            case 7:
+//                if (!follower.isBusy()) {
+//                    follower.followPath(line8);
+//                    setPathState(8);
 //                }
+//                break;
+
+//            case 8:
+//                if (!follower.isBusy()) {
+//                    setPathState(-9);
+//                }
+//                break;
+
+            case -9:
+                if (!intakeBeamBreak.isBeamStable()) {
+                    ballsToShoot = 3;
+                } else {
+//                    if (2 >= intakeBeamBreak.getBallCount()){
+//                        ballsToShoot = intakeBeamBreak.getBallCount();
+//                    }
+                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
+                }
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5 && shootTime.getElapsedTimeSeconds() < 28.5) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < 3150) {
                             stopTransfer();
                         }
                     } else {
                         stopTransfer();
                         out.block();
-                        //intake();
-                        outtakeBeamBreak.resetBallCount();
+                        shooter.eStop();
+//                        intake();
                         setPathState(9);
                     }
                 }
@@ -409,56 +405,46 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 9:
                 if (!follower.isBusy()) {
-                    shooter.eStop();
-                    stopIntake();
-
+//                    intake();
+                    outtakeBeamBreak.resetBallCount();
                     follower.followPath(line10);
-
                     setPathState(10);
                 }
                 break;
-//
+
             case 10:
                 if (!follower.isBusy()) {
-                    shooter.eStop();
-                    //follower.followPath(line11);
-                    //setPathState(11);
                     follower.pausePathFollowing();
-
+//                    follower.followPath(line11);
+//                    setPathState(11);
                 }
                 break;
-//
-//            case 11:
-//                if (!follower.isBusy()) {
-//                    stopIntake();
-//                    shooter.setTargetRPM(2550);
-//                    follower.followPath(line12);
-//                    setPathState(12);
-//                }
-//                break;
-//
-//            case 12:
-//                if (!follower.isBusy()) {
-//                    if (shootTime.getElapsedTimeSeconds() < 28) {
-//                        if (shooter.isAtTargetThreshold()) {
-//                            transfer();
-//                        } else if (shooter.getShooterVelocity() < 2300) {
-//                            stopTransfer();
-//                        }
-//                    } else {
-//                        stopTransfer();
-//                        out.block();
-//                        shooter.setTargetRPM(0);
-//                        setPathState(13);
-//                    }
-//                }
-//                break;
-//            case 13:
-//                if (!follower.isBusy()) {
-//                    shooter.eStop();
-//                    follower.followPath(line13);
-//                }
-//        }
+
+            case 11:
+                if (!follower.isBusy()) {
+                    stopIntake();
+                    shooter.setTargetRPM(2400);
+                    follower.followPath(line12);
+                    setPathState(12);
+                }
+                break;
+
+            case 12:
+                if (!follower.isBusy()) {
+                    if (shootTime.getElapsedTimeSeconds() < 31) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        } else if (shooter.getShooterVelocity() < 2250) {
+                            stopTransfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        intake();
+                        shooter.setTargetRPM(0);
+                    }
+                }
+                break;
         }
     }
 

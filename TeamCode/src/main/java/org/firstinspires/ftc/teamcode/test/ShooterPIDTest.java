@@ -21,13 +21,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @Config
 @TeleOp
 public class ShooterPIDTest extends CommandOpMode {
-    private DcMotorEx shooter;
+    private DcMotorEx shooter1, shooter2;
     public GamepadEx driver;
 
     // Dashboard-tunable constants
     public static double TARGET_RPM = 3500.0; // 4000
     public static double MOTOR_RPM = 6000.0; // 1410
-    public static double GEAR_RATIO = (1/1.448275);
+    public static double GEAR_RATIO = 40.0 / 52.0;
     public static double TICKS_PER_REV = 28;
 
 
@@ -48,13 +48,22 @@ public class ShooterPIDTest extends CommandOpMode {
         dash = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
 
-        shooter = hardwareMap.get(DcMotorEx.class, "m1");
+        shooter1 = hardwareMap.get(DcMotorEx.class, "m1");
 
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
+        shooter2 = hardwareMap.get(DcMotorEx.class, "m2");
+
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         applyPIDF();
 
@@ -70,13 +79,14 @@ public class ShooterPIDTest extends CommandOpMode {
         if (kFLocal == 0.0) {
             // Based on achievable max ticks/s reported by the SDK
             // Good starting point for later tuning in Dashboard.
-            double maxTps = shooter.getMotorType().getAchieveableMaxTicksPerSecond();
+            double maxTps = shooter1.getMotorType().getAchieveableMaxTicksPerSecond();
             if (maxTps <= 0) maxTps = (1620.0 * TICKS_PER_REV) / 60.0;
             // REV internal scaling expects kF around 32767/maxVelocity as a reasonable baseline
             kFLocal = 32767.0 / maxTps;
         }
         kfValue = kFLocal;
-        shooter.setVelocityPIDFCoefficients(kP, kI, kD, kFLocal);
+        shooter1.setVelocityPIDFCoefficients(kP, kI, kD, kFLocal);
+        shooter2.setVelocityPIDFCoefficients(kP, kI, kD, kFLocal);
     }
 
     @Override
@@ -90,14 +100,17 @@ public class ShooterPIDTest extends CommandOpMode {
         double targetTicksPerSec = (targetMotorRPM * TICKS_PER_REV) / 60.0;
 
         if (runShooter) {
-            shooter.setVelocity(targetTicksPerSec); // ticks/s
+            shooter1.setVelocity(targetTicksPerSec); // ticks/s
+            shooter2.setVelocity(targetTicksPerSec);
         } else {
-            shooter.setVelocity(0);
+            shooter1.setVelocity(0);
+            shooter2.setVelocity(0);
         }
 
         // Gets current velo of motor
-        double currTicksPerSec = shooter.getVelocity(); // ticks/s of motor
-        double currMotorRPM = (currTicksPerSec * 60.0) / TICKS_PER_REV;
+        double currTicksPerSec = shooter1.getVelocity(); // ticks/s of motor
+        double currTicksPerSec2 = shooter2.getVelocity();
+        double currMotorRPM = (((currTicksPerSec + currTicksPerSec2) / 2) * 60) / TICKS_PER_REV;
         double currShooterRPM = currMotorRPM * GEAR_RATIO;
 
         // Tuning Stuff

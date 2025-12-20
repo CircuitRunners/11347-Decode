@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.BlueAutos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -25,15 +25,13 @@ import java.util.List;
 @Disabled
 @Config
 @Configurable
-@Autonomous(name="Red Side Auto Close 9",group="Red Autos", preselectTeleOp="MainTeleOp")
-public class RedSideClose9 extends OpMode {
+@Autonomous(name="Blue Side Auto Close 9",group="Blue Autos", preselectTeleOp="MainTeleOp")
+public class BlueSideClose9 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
-
-    private int FAR_SHOOTER_POWER = 4900;
-    private int CLOSE_SHOOTER_POWER = 3700;
+    private int CLOSE_SHOOTER_POWER = 3500;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
@@ -46,7 +44,7 @@ public class RedSideClose9 extends OpMode {
     private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(110.5, 135.5, Math.toRadians(0));
+    private final Pose startPose = new Pose(33.5, 135.5, Math.toRadians(180));
 
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8, line9, line10;
@@ -55,90 +53,121 @@ public class RedSideClose9 extends OpMode {
         line1 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(110.500, 135.500), new Pose(100.000, 100.000))
+                        new BezierLine(new Pose(33.500, 135.500), new Pose(44.000, 100.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180 - 0),
+                        Math.toRadians(180 - 46)
+                )
                 .build();
 
         line2 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(100.000, 100.000), new Pose(97.000, 84.000))
+                        new BezierLine(new Pose(44.000, 100.000), new Pose(47.000, 84.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180 - 46),
+                        Math.toRadians(180 - 0)
+                )
                 .build();
 
         line3 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(97.000, 84.000), new Pose(125.000, 84.000))
+                        new BezierLine(new Pose(47.000, 84.000), new Pose(19.000, 84.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180)
+                )
                 .build();
 
         line4 = follower
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(125.000, 84.000),
-                                new Pose(120.000, 78.000),//80
-                                new Pose(119.500, 75.000)
+                                new Pose(19.000, 84.000),
+                                new Pose(24.000, 78.000),
+                                new Pose(24.500, 75.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180)
+                )
                 .build();
 
         line5 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(119.500, 75.000), new Pose(125.000, 75.000))
+                        new BezierLine(new Pose(24.500, 75.000), new Pose(19.000, 75.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180)
+                )
                 .build();
 
         line6 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(129.000, 75.000), new Pose(100.000, 100.000))
+                        new BezierLine(new Pose(15.000, 75.000), new Pose(44.000, 100.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180 - 46)
+                )
                 .build();
 
         line7 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(100.000, 100.000), new Pose(97.000, 60.000))
+                        new BezierLine(new Pose(44.000, 100.000), new Pose(47.000, 60.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180 - 46),
+                        Math.toRadians(180)
+                )
                 .build();
 
         line8 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(97.000, 60.000), new Pose(133.500, 60.000))
+                        new BezierLine(new Pose(47.000, 60.000), new Pose(10.5000, 60.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180)
+                )
                 .build();
 
         line9 = follower
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(133.500, 60.000),
-                                new Pose(98.000, 64.000),//80
-                                new Pose(100.000, 100.000)
+                                new Pose(10.500, 60.000),
+                                new Pose(46.000, 64.000),
+                                new Pose(44.000, 100.000)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(46))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        Math.toRadians(180 - 46)
+                )
                 .build();
 
         line10 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(100.000, 100.000), new Pose(120.000, 75.000))
+                        new BezierLine(new Pose(44.000, 100.000), new Pose(24.000, 75.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(46), Math.toRadians(0))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(180 - 46),
+                        Math.toRadians(180)
+                )
                 .build();
+
 
 
     }
@@ -269,7 +298,7 @@ public class RedSideClose9 extends OpMode {
             case -1:
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 9) {
-                        if (shooter.isAtTargetThreshold()) {
+                        if (shooter.getShooterVelocity() >= 2300) {
                             transfer();
                         }
                     } else {
@@ -335,7 +364,7 @@ public class RedSideClose9 extends OpMode {
 //                }
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.isAtTargetThreshold()) {
+                        if (shooter.getShooterVelocity() >= 200) {
                             transfer();
                         }
                     } else {
@@ -382,7 +411,7 @@ public class RedSideClose9 extends OpMode {
 //                }
                 if (!follower.isBusy()) {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.isAtTargetThreshold()) {
+                        if (shooter.getShooterVelocity() >= 200) {
                             transfer();
                         }
                     } else {

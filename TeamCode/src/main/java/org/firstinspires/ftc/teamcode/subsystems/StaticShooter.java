@@ -18,16 +18,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @Config
 public class StaticShooter extends SubsystemBase {
     // --- Hardware ---
-    private DcMotorEx shooter;
+    private DcMotorEx shooter1, shooter2;
 
     // --- Dashboard & Telemetry ---
     private FtcDashboard dash;
 
     // --- Shooter Constants ---
-    private static double TARGET_RPM = 3500.0;         // desired shooter RPM
+    private static double TARGET_RPM = 4500.0;         // desired shooter RPM
     private static double MOTOR_RPM = 6000.0;          // motor RPM (based on max motor rpm)
-    private static double GEAR_RATIO = (1/1.448275);            // gear ratio from motor to shooter
-    private static double TICKS_PER_REV = 28;       // motor encoder ticks per revolution
+    private static double GEAR_RATIO = 40.0 / 52.0;    // gear ratio from motor to shooter
+    private static double TICKS_PER_REV = 28;          // motor encoder ticks per revolution
     private boolean active;
 
     // --- PIDF Coefficients ---
@@ -36,10 +36,18 @@ public class StaticShooter extends SubsystemBase {
     public double kI = 0.0;
     public double kD = 10.0;
     public double kF = 13.0;*/
-    public static double kP = 6; // 35
+
+    /// Working values for 1 6k rpm motor at lm3
+//    public static double kP = 6; // 35
+//    public static double kI = 0.0;
+//    public static double kD = 5; // 10
+//    public static double kF = 8; // 13
+
+    /// Working values for 2 6k motors as of 12/20/25
+    public static double kP = 13;
     public static double kI = 0.0;
-    public static double kD = 5; // 10
-    public static double kF = 8; // 13
+    public static double kD = 6;
+    public static double kF = 8;
 
     /**
      * Initialises the shooter in the hardwareMap, sets default shooter values
@@ -63,12 +71,22 @@ public class StaticShooter extends SubsystemBase {
         telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
 
         // Configs shooter
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
 
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
+        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
 
         // Configs defaults
         setTargetRPM(defaultTargetRPM);
@@ -109,7 +127,8 @@ public class StaticShooter extends SubsystemBase {
 
     /** Applies current shooter velocity PIDF coefficients */
     public void applyPIDF() {
-        shooter.setVelocityPIDFCoefficients(kP, kI, kD, kF);
+        shooter1.setVelocityPIDFCoefficients(kP, kI, kD, kF);
+        shooter2.setVelocityPIDFCoefficients(kP, kI, kD, kF);
     }
 
     // --- Constants Control ---
@@ -185,15 +204,18 @@ public class StaticShooter extends SubsystemBase {
 //        double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
         double targetMotorRPM = TARGET_RPM / GEAR_RATIO;
         double targetTicksPerSec = (targetMotorRPM * TICKS_PER_REV) / 60.0;
-        shooter.setVelocity(targetTicksPerSec);
+        shooter1.setVelocity(targetTicksPerSec);
+        shooter2.setVelocity(targetTicksPerSec);
 
         active = Math.abs(getTargetRPM()) > 0;
     }
 
     /** Stops all shooter motion immediately. */
     public void eStop() {
-        shooter.setPower(0);
-        shooter.setVelocity(0);
+        shooter1.setPower(0);
+        shooter1.setVelocity(0);
+        shooter2.setPower(0);
+        shooter2.setVelocity(0);
     }
 
     /**
@@ -202,11 +224,16 @@ public class StaticShooter extends SubsystemBase {
      *         motor rpm, ticks per rev, and gear ratio
      */
     public double getShooterVelocity() {
-        double currTicksPerSec = shooter.getVelocity(); // ticks/s of motor
-        double currMotorRPM = (currTicksPerSec * 60.0) / TICKS_PER_REV;
+//        double currTicksPerSec = shooter1.getVelocity(); // ticks/s of motor
+//        double currMotorRPM = (currTicksPerSec * 60.0) / TICKS_PER_REV;
 //        double currShooterRPM = currMotorRPM * GEAR_RATIO;
 //
 //        return currShooterRPM;
+
+        double currTicksPerSec = shooter1.getVelocity(); // ticks/s of motor
+        double currTicksPerSec2 = shooter2.getVelocity();
+        double currMotorRPM = (((currTicksPerSec + currTicksPerSec2) / 2) * 60) / TICKS_PER_REV;
+
         return currMotorRPM;
     }
 
@@ -215,7 +242,7 @@ public class StaticShooter extends SubsystemBase {
      * @return Returns motor voltage
      */
     public double getMotorVoltage() {
-        return shooter.getCurrent(CurrentUnit.AMPS);
+        return shooter1.getCurrent(CurrentUnit.AMPS);
     }
 
     public boolean isActive() {

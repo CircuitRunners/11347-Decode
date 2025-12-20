@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.RedAutos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -25,8 +25,8 @@ import java.util.List;
 @Disabled
 @Config
 @Configurable
-@Autonomous(name="Blue Side Auto Far 6",group="Blue Autos", preselectTeleOp="MainTeleOp")
-public class BlueSideAutoFar6 extends OpMode {
+@Autonomous(name="Red Side Auto Far 6",group="Red Autos", preselectTeleOp="MainTeleOp")
+public class RedSideAutoFar6 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
@@ -43,21 +43,21 @@ public class BlueSideAutoFar6 extends OpMode {
     private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(40.0, 8.2, Math.toRadians(180));
+    private final Pose startPose = new Pose(104.0, 8.2, Math.toRadians(0));
     private PathChain line1, line2, line3, line4,  line8;
     public void buildPaths() {
         line1 = follower
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(40.000, 8.200),    // mirrored
-                                new Pose(56.000, 19.200),   // mirrored
-                                new Pose(55.000, 14.000)    // mirrored
+                                new Pose(104.000, 8.200),   // 144-40
+                                new Pose(88.000, 19.200),   // 144-56
+                                new Pose(89.000, 14.000)    // 144-55
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(180),              // mirror of 0°
-                        Math.toRadians(113.5)             // mirror of 66.5°
+                        Math.toRadians(0),                // pi - 180°
+                        Math.toRadians(66.5)             // pi - 113.5°
                 )
                 .build();
 
@@ -65,14 +65,14 @@ public class BlueSideAutoFar6 extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(55.000, 14.000),   // mirrored
-                                new Pose(56.300, 27.200),   // mirrored
-                                new Pose(41.000, 35.000)    // mirrored
+                                new Pose(89.00, 14.00),   // 144-56.8
+                                new Pose(87.700, 27.200),   // 144-56.3
+                                new Pose(103.000, 35.000)   // 144-41
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(113.5),            // mirror of 66.5°
-                        Math.toRadians(180)               // mirror of 0°
+                        Math.toRadians(66.5),
+                        Math.toRadians(0)
                 )
                 .build();
 
@@ -80,13 +80,13 @@ public class BlueSideAutoFar6 extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierLine(
-                                new Pose(41.000, 35.000),   // mirrored
-                                new Pose(8.000, 35.000)     // mirrored
+                                new Pose(103.000, 35.000),  // 144-41
+                                new Pose(136.000, 35.000)   // 144-8
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(180),
-                        Math.toRadians(180)
+                        Math.toRadians(0),
+                        Math.toRadians(0)
                 )
                 .build();
 
@@ -94,31 +94,32 @@ public class BlueSideAutoFar6 extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(8.000, 35.000),    // mirrored
-                                new Pose(45.000, 35.000),   // mirrored
-                                new Pose(55.000, 14.000)    // mirrored
+                                new Pose(136.000, 35.000),  // 144-8
+                                new Pose(99.000, 35.000),   // 144-45
+                                new Pose(89.000, 14.000)    // 144-55
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(180),
-                        Math.toRadians(113.2)              // mirror of 66.8°
+                        Math.toRadians(0),
+                        Math.toRadians(66.8)
                 )
                 .build();
+
+
 
         line8 = follower
                 .pathBuilder()
                 .addPath(
                         new BezierLine(
-                                new Pose(55.000, 14.000),   // mirrored
-                                new Pose(35.000, 9.000)     // mirrored
+                                new Pose(89.000, 14.000),    // 144-55
+                                new Pose(109.000, 9.000)     // 144-35
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(113.2),             // mirror of 66.8°
-                        Math.toRadians(0)                  // mirror of 180°
+                        Math.toRadians(66.8),
+                        Math.toRadians(0)                 // pi - 0°
                 )
                 .build();
-
     }
 
 

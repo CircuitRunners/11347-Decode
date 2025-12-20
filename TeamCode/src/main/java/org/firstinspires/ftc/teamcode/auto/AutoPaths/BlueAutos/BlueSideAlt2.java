@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.BlueAutos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -32,7 +32,7 @@ public class BlueSideAlt2 extends OpMode {
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
-
+    private int FAR_SHOOTER_POWER = 4500;
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
@@ -116,7 +116,7 @@ public class BlueSideAlt2 extends OpMode {
                         new Pose(56.300, 27.200),
                         new Pose(41.000, 35.000)
                 ))
-                .setLinearHeadingInterpolation(Math.toRadians(113.5), Math.toRadians(0))
+                .setLinearHeadingInterpolation(Math.toRadians(113.5), Math.toRadians(180))
                 .build();
 
 //
@@ -253,7 +253,7 @@ public class BlueSideAlt2 extends OpMode {
             //Sets up before movement
             case -2:
                 if (!follower.isBusy()) {
-                    shooter.setTargetRPM(3300);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -309,7 +309,7 @@ public class BlueSideAlt2 extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(3300);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
@@ -360,7 +360,7 @@ public class BlueSideAlt2 extends OpMode {
             case 6:
                 if (!follower.isBusy()) {
                     stopIntake();
-                    shooter.setTargetRPM(3300);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.followPath(line7);
                     setPathState(-9);
                 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.RedAutos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -25,8 +25,8 @@ import java.util.List;
 @Disabled
 @Config
 @Configurable
-@Autonomous(name="Red Side Auto Far 6",group="Red Autos", preselectTeleOp="MainTeleOp")
-public class RedSideAutoFar6 extends OpMode {
+@Autonomous(name="Red Side Auto Far",group="Red Autos", preselectTeleOp="MainTeleOp")
+public class RedSideAutoFar9 extends OpMode {
     private Follower follower;
     private Timer pathTimer;
     private int pathState = 0;
@@ -44,7 +44,8 @@ public class RedSideAutoFar6 extends OpMode {
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
     private final Pose startPose = new Pose(104.0, 8.2, Math.toRadians(0));
-    private PathChain line1, line2, line3, line4,  line8;
+    private PathChain line1, line2, line3, line4, line5, line6,
+            line7, line8;
     public void buildPaths() {
         line1 = follower
                 .pathBuilder()
@@ -101,11 +102,53 @@ public class RedSideAutoFar6 extends OpMode {
                 )
                 .setLinearHeadingInterpolation(
                         Math.toRadians(0),
-                        Math.toRadians(66.8)
+                        Math.toRadians(66.5)
                 )
                 .build();
 
+        line5 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(89.000, 14.000),    // 144-55
+                                new Pose(109.000, 29.000),   // 144-35
+                                new Pose(136.000, 28.000)    // 144-8
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(66.5),
+                        Math.toRadians(270)                 // pi - 270°
+                )
+                .build();
 
+        line6 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Pose(136.000, 28.000),   // 144-8
+                                new Pose(136.000, 11.000)    // 144-8
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(270),
+                        Math.toRadians(270)
+                )
+                .build();
+
+        line7 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(136.000, 11.000),   // 144-8
+                                new Pose(109.000, 18.000),   // 144-35
+                                new Pose(89.000, 14.000)     // 144-55
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(270),
+                        Math.toRadians(66.5)
+                )
+                .build();
 
         line8 = follower
                 .pathBuilder()
@@ -116,14 +159,14 @@ public class RedSideAutoFar6 extends OpMode {
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(66.8),
-                        Math.toRadians(180)                 // pi - 0°
+                        Math.toRadians(66.5),
+                        Math.toRadians(0)                 // pi - 0°
                 )
                 .build();
     }
 
 
-    @Override
+        @Override
     public void init() {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
@@ -247,7 +290,7 @@ public class RedSideAutoFar6 extends OpMode {
 
             case -1:
 
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 11) {
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 10) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
                     } else if (shooter.getShooterVelocity() < 3100) {
@@ -304,7 +347,7 @@ public class RedSideAutoFar6 extends OpMode {
 //                }
                 if (!follower.isBusy()) {
                     //&& shootTime.getElapsedTimeSeconds() < 18
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 10)) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 7)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         } else if (shooter.getShooterVelocity() < 3100) {
@@ -313,41 +356,41 @@ public class RedSideAutoFar6 extends OpMode {
                     } else {
                         stopTransfer();
                         out.block();
-                        stopIntake();
+                        intake();
                         outtakeBeamBreak.resetBallCount();
-                        setPathState(9);
+                        setPathState(4);
                     }
                 }
                 break;
 
-//            case 4:
-//                if (!follower.isBusy()) {
-//                    intake();
-//                    follower.setMaxPower(0.7);
-//                    follower.followPath(line5);
-//                    setPathState(5);
-//                }
-//                break;
-//
-//            case 5:
-//                if (!follower.isBusy()) {
-//                    follower.setMaxPower(0.7);
-//                    follower.followPath(line6);
-//                    setPathState(6);
-//                }
-//
-//                break;
-//
-//            case 6:
-//                if (!follower.isBusy()) {
-//                    //stopIntake();
-//                    follower.setMaxPower(0.8);
-//                    shooter.setTargetRPM(3400);
-//                    ballsToShoot = 3;
-//                    follower.followPath(line7);
-//                    setPathState(-9);
-//                }
-//                break;
+            case 4:
+                if (!follower.isBusy()) {
+                    intake();
+                    follower.setMaxPower(0.7);
+                    follower.followPath(line5);
+                    setPathState(5);
+                }
+                break;
+
+            case 5:
+                if (!follower.isBusy()) {
+                    follower.setMaxPower(0.7);
+                    follower.followPath(line6);
+                    setPathState(6);
+                }
+
+                break;
+
+            case 6:
+                if (!follower.isBusy()) {
+                    //stopIntake();
+                    follower.setMaxPower(0.8);
+                    shooter.setTargetRPM(3400);
+                    ballsToShoot = 3;
+                    follower.followPath(line7);
+                    setPathState(-9);
+                }
+                break;
 
 //            case 7:
 //                if (!follower.isBusy()) {
@@ -362,28 +405,28 @@ public class RedSideAutoFar6 extends OpMode {
 //                }
 //                break;
 
-//            case -9:
-////                if (intakeBeamBreak.isBeamStable()) {
-////                    ballsToShoot = 3;
-////                } else {
-////                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-////                }
-//                if (!follower.isBusy()) {
-//                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7.5 && shootTime.getElapsedTimeSeconds() < 28.5) {
-//                        if (shooter.isAtTargetThreshold()) {
-//                            transfer();
-//                        } else if (shooter.getShooterVelocity() < 3100) {
-//                            stopTransfer();
-//                        }
-//                    } else {
-//                        stopTransfer();
-//                        out.block();
-//                        //intake();
-//                        outtakeBeamBreak.resetBallCount();
-//                        setPathState(9);
-//                    }
+            case -9:
+//                if (intakeBeamBreak.isBeamStable()) {
+//                    ballsToShoot = 3;
+//                } else {
+//                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
 //                }
-//                break;
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7.5 && shootTime.getElapsedTimeSeconds() < 28.5) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        } else if (shooter.getShooterVelocity() < 3100) {
+                            stopTransfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        //intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(9);
+                    }
+                }
+                break;
 
             case 9:
                 if (!follower.isBusy()) {
@@ -391,18 +434,19 @@ public class RedSideAutoFar6 extends OpMode {
 
                     follower.followPath(line8);
 
-                    setPathState(10);
+                    //setPathState(10);
                 }
                 break;
 //
-            case 10:
-                if (!follower.isBusy()) {
-                    shooter.eStop();
-
-                    follower.pausePathFollowing();
-
-                }
-                break;
+//            case 10:
+//                if (!follower.isBusy()) {
+//                    shooter.eStop();
+//                    follower.followPath(line11);
+//                    setPathState(11);
+//                    //follower.pausePathFollowing();
+//
+//                }
+//                break;
 //
 //            case 11:
 //                if (!follower.isBusy()) {

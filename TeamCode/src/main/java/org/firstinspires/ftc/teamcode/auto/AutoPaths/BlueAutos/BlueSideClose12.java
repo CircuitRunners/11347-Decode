@@ -1,5 +1,5 @@
-package org.firstinspires.ftc.teamcode.auto.AutoPaths;
-
+package org.firstinspires.ftc.teamcode.auto.AutoPaths.BlueAutos;
+//mathew is an idiot and sucks at programming - Justin Racel
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -32,7 +32,7 @@ public class BlueSideClose12 extends OpMode {
     private int pathState = 0;
     private int ballsToShoot;
 
-    private int CLOSE_SHOOTER_POWER = 3900;
+    private int CLOSE_SHOOTER_POWER = 3500;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
