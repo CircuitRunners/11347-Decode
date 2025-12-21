@@ -31,6 +31,7 @@ public class BlueSideWithGateTESTTESTTEST extends OpMode {
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
+    private int cycle = 0;
     private int CLOSE_SHOOTER_POWER = 3500;
 
     Timer shootTime = new Timer();
@@ -60,12 +61,22 @@ public class BlueSideWithGateTESTTESTTEST extends OpMode {
         line2 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(44.000, 100.000), new Pose(11.000, 60.000))
+                        new BezierCurve(
+                                new Pose(44.000, 100.000),
+                                new Pose(50.000, 70.000),
+                                new Pose(8.000, 62.500)
+                        )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(145))
+                .setLinearHeadingInterpolation(Math.toRadians(134), Math.toRadians(142))
                 .build();
-    
 
+        line3 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(11.000, 62.500), new Pose(44.000, 100.000))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(142), Math.toRadians(134))
+                .build();
     }
 
 
@@ -175,72 +186,83 @@ public class BlueSideWithGateTESTTESTTEST extends OpMode {
     private void autonomousPathUpdate() {
         switch (pathState) {
             case -2:
+                if (!follower.isBusy()) { //goes to shooting position
+                    follower.setMaxPower(1);
+                    shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
+                    out.aimClose();
 
-                break;
-
-            case 0:
-
+                    setPathState(-1);
+                }
                 break;
 
             case -1:
 
+                if (!follower.isBusy()) {
+                    follower.followPath(line1);
+                    shootTime.resetTimer();
+                    setPathState(0);
+                }
+                break;
+
+            case 0:
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 9) {
+                        if (shooter.getShooterVelocity() >= 3000) {
+                            transfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(1);
+                    }
+                }
                 break;
 
             case 1:
-
+                if (!follower.isBusy()) {
+                    intake();
+                    //follower.setMaxPower(0.7);
+                    follower.followPath(line2);
+                    ballsToShoot = 3;
+                    setPathState(2);
+                }
                 break;
 
             case 2:
-
+                if (pathTimer.getElapsedTimeSeconds() > 3.8){
+                    follower.followPath(line3);
+                    //pathTimer.resetTimer();
+                    setPathState(3);
+                }
                 break;
-
 
             case 3:
-
-                break;
-
-            case -4:
-
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
+                        if (shooter.getShooterVelocity() >= 200) {
+                            transfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(4);
+                    }
+                }
                 break;
 
             case 4:
-
-                break;
-
-            case 5:
-
-                break;
-
-            case 6:
-
-                break;
-
-            case 7:
-
-                break;
-
-            case 8:
-
-                break;
-
-            case -9:
-
-                break;
-
-            case 9:
-
-                break;
-
-            case 10:
-
-                break;
-
-            case 11:
-
-                break;
-
-            case 12:
-
+                if (cycle < 3){
+                    cycle++;
+                    ballsToShoot = 3;
+                    setPathState(1);
+                }
+                else{
+                    out.aimScoring();
+                }
                 break;
         }
     }
