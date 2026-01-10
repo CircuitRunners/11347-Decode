@@ -81,7 +81,7 @@ public class BlueSideClose12 extends OpMode {
                         new BezierCurve(
                                 new Pose(19.000, 84.000),
                                 new Pose(24.000, 78.000),
-                                new Pose(26.500, 76.000)//26
+                                new Pose(22.000, 76.000)//26
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -90,7 +90,7 @@ public class BlueSideClose12 extends OpMode {
         line5 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(26.500, 76.000), new Pose(19.000, 76.000))
+                        new BezierLine(new Pose(22.000, 76.000), new Pose(19.000, 76.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();

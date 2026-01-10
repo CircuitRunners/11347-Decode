@@ -31,7 +31,7 @@ public class RedSideAutoFar6 extends OpMode {
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
-
+    private int FAR_SHOOTER_POWER = 4500;
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
@@ -231,7 +231,7 @@ public class RedSideAutoFar6 extends OpMode {
             case -2:
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1);
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     out.aimScoring();
                     setPathState(0);
                 }
@@ -284,7 +284,7 @@ public class RedSideAutoFar6 extends OpMode {
             case 3:
                 if (!follower.isBusy()) {
                     //stopIntake();
-                    shooter.setTargetRPM(3400);
+                    shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.setMaxPower(1);
                     follower.followPath(line4);
                     setPathState(-4);

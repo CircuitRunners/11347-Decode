@@ -270,7 +270,7 @@ public class BlueSideAlt2 extends OpMode {
 
             //Shoots balls until intake is empty and then resets intake count
             case -1:
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot && pathTimer.getElapsedTimeSeconds() > 2)) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
                     } else if (shooter.getShooterVelocity() < 3000) {

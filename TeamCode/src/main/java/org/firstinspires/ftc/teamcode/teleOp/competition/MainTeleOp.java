@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
@@ -26,6 +28,8 @@ import org.firstinspires.ftc.teamcode.support.AlliancePresets;
 import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
+import com.pedropathing.follower.Follower;
+
 import java.util.Locale;
 
 @Config
@@ -36,6 +40,7 @@ public class MainTeleOp extends CommandOpMode {
     private MecanumDrivebase drive;
     private OuttakeSubsystem out;
     private IntakeSubsystem in;
+    private Follower follower;
     private GoBildaPinpointDriver pinpoint;
     private LimelightSubsystem limelight;
     private GobildaRGBIndicatorHelper rgbHelper;
@@ -68,7 +73,7 @@ public class MainTeleOp extends CommandOpMode {
         limelight.setAllianceTagID(AlliancePresets.getAllianceShooterTag());
         rgbHelper = new GobildaRGBIndicatorHelper(hardwareMap);
         intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 0);
-
+        follower = Constants.createFollower(hardwareMap);
 
         // Default Commands
         // Intake Command
@@ -109,6 +114,18 @@ public class MainTeleOp extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
                 .whenPressed(new TransferCommand(in, out, driver));
 
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(()-> {
+        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
+                8,8,
+                AngleUnit.RADIANS, Math.toRadians(0));
+        //pinpoint.setPosition(newPose);
+
+        follower.setPose(new Pose(8,8, Math.toRadians(0)));
+
+                }));
+        telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
+
         //Heading Lock
         driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(new InstantCommand(()-> headingLockEnabled = !headingLockEnabled));
@@ -125,6 +142,7 @@ public class MainTeleOp extends CommandOpMode {
         shooter.update();
         limelight.update();
         intakeBeamBreak.update();
+        follower.update();
 
         out.aiming(gamepad1.cross, gamepad1.triangle);
 
@@ -144,9 +162,7 @@ public class MainTeleOp extends CommandOpMode {
         Pose2D pose;
         pose = driveFieldRelative(forward, right, rotate);
 
-        if (shooter.isAtTargetThreshold()) {
-            rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.BLUE);
-        } else if (intakeBeamBreak.isBeamStable()) {
+        if (intakeBeamBreak.isBeamStable()) {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.GREEN);
         } else {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.RED);
@@ -157,6 +173,14 @@ public class MainTeleOp extends CommandOpMode {
                 pose.getX(DistanceUnit.INCH),
                 pose.getY(DistanceUnit.INCH),
                 pose.getHeading(AngleUnit.DEGREES)
+        );
+
+        String followerData = String.format(Locale.US,
+                "{X: %.3f, Y: %.3f, H: %.3f}",
+                follower.getPose().getX(),
+                follower.getPose().getY(),
+                Math.toDegrees(follower.getPose().getHeading())
+
         );
 
         driver.getGamepadButton(GamepadKeys.Button.B)
@@ -194,6 +218,7 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addLine();
         telemetry.addLine("----  Pinpoint Data  ----");
         telemetry.addData("Position", data);
+        telemetry.addData("Follower Position:", followerData);
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
         telemetry.addData("Soft limit On?", aimServoLimit);
@@ -224,7 +249,7 @@ public class MainTeleOp extends CommandOpMode {
         pinpoint.setOffsets(-28.042, -147.012, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD
         );
     }
