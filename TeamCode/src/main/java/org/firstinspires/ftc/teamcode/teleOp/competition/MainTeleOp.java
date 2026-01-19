@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
@@ -253,4 +254,18 @@ public class MainTeleOp extends CommandOpMode {
                 GoBildaPinpointDriver.EncoderDirection.FORWARD
         );
     }
+
+//    public void updateCoordinatesWithAprilTag() {
+//        limelight.limelight.updateRobotOrientation(follower.getHeading());
+//        limelight.limelight.pipelineSwitch(0);
+//        LLResult result = limelight.limelight.getLatestResult();
+//        if (result != null && result.isValid()) {
+//            Pose3D mt1Pose = result.getBotpose();
+//            if (mt1Pose != null) {
+//                double finalX = (mt1Pose.getPosition().y * METERS_TO_INCH) + 72.0;
+//                double finalY = (-mt1Pose.getPosition().x * METERS_TO_INCH) + 72.0;
+//                follower.setPose(new Pose(finalX, finalY, follower.getHeading()));
+//                gamepad1.rumble(500);
+//            }
+//        }
 }

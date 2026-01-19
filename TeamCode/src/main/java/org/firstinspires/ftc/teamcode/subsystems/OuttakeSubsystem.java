@@ -101,7 +101,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void aimClose() {
-        setAim(0.12);
+        setAim(0.15);
     }
 
     public void setAim(double position) {

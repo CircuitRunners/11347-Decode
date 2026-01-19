@@ -252,6 +252,7 @@ public class RedSideAlt2 extends OpMode {
             //Sets up before movement
             case -2:
                 if (!follower.isBusy()) {
+                    follower.setMaxPower(1);
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     out.aimScoring();
                     setPathState(0);
@@ -269,18 +270,17 @@ public class RedSideAlt2 extends OpMode {
 
             //Shoots balls until intake is empty and then resets intake count
             case -1:
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
+                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 10) {
                     if (shooter.isAtTargetThreshold()) {
                         transfer();
-                    } else if (shooter.getShooterVelocity() < 3150) {
+                    } else if (shooter.getShooterVelocity() < 3100) {
                         stopTransfer();
                     }
                 } else {
                     stopTransfer();
                     out.block();
-                    out.aimScoring();
                     intake();
-                    intakeBeamBreak.resetBallCount();
+                    outtakeBeamBreak.resetBallCount();
                     setPathState(1);
                 }
                 break;
@@ -299,6 +299,7 @@ public class RedSideAlt2 extends OpMode {
             //Moves to collect balls
             case 2:
                 if (!follower.isBusy()) {
+                    ballsToShoot = 3;
                     follower.followPath(line3);
                     setPathState(3);
                 }
@@ -309,32 +310,25 @@ public class RedSideAlt2 extends OpMode {
                 if (!follower.isBusy()) {
                     stopIntake();
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
+                    follower.setMaxPower(1);
                     follower.followPath(line4);
                     setPathState(-4);
                 }
                 break;
 
             case -4:
-                if (!intakeBeamBreak.isBeamStable()) {
-                    ballsToShoot = 3;
-                } else {
-//                    if (2 >= intakeBeamBreak.getBallCount()){
-//                        ballsToShoot = intakeBeamBreak.getBallCount();
-//                    }
-                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-                }
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 7)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3150) {
+                        } else if (shooter.getShooterVelocity() < 3100) {
                             stopTransfer();
                         }
                     } else {
                         stopTransfer();
                         out.block();
                         intake();
-                        intakeBeamBreak.resetBallCount();
+                        outtakeBeamBreak.resetBallCount();
                         setPathState(4);
                     }
                 }
@@ -343,7 +337,6 @@ public class RedSideAlt2 extends OpMode {
             case 4:
                 if (!follower.isBusy()) {
                     intake();
-                    outtakeBeamBreak.resetBallCount();
                     follower.followPath(line5);
                     setPathState(5);
                 }
@@ -358,7 +351,7 @@ public class RedSideAlt2 extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    stopIntake();
+                    ballsToShoot = 3;
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.followPath(line7);
                     setPathState(-9);
@@ -379,19 +372,11 @@ public class RedSideAlt2 extends OpMode {
 //                break;
 
             case -9:
-                if (!intakeBeamBreak.isBeamStable()) {
-                    ballsToShoot = 3;
-                } else {
-//                    if (2 >= intakeBeamBreak.getBallCount()){
-//                        ballsToShoot = intakeBeamBreak.getBallCount();
-//                    }
-                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-                }
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot)) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7.5 && shootTime.getElapsedTimeSeconds() < 28.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3150) {
+                        } else if (shooter.getShooterVelocity() < 3100) {
                             stopTransfer();
                         }
                     } else {
