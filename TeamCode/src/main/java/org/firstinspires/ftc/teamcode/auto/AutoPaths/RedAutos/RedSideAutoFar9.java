@@ -31,7 +31,9 @@ public class RedSideAutoFar9 extends OpMode {
     private Timer pathTimer;
     private int pathState = 0;
     private int ballsToShoot;
-    private int FAR_SHOOTER_POWER = 4500;
+    private int FAR_SHOOTER_POWER = 4600;
+    private int LOWEST_POWER = 4300;
+    private double SHOOTING_ANGLE = 66.5;
     Timer shootTime = new Timer();
     private StaticShooter shooter;
     private IntakeSubsystem in;
@@ -45,7 +47,7 @@ public class RedSideAutoFar9 extends OpMode {
     private Thread outtakeThread;
     private final Pose startPose = new Pose(104.0, 8.2, Math.toRadians(0));
     private PathChain line1, line2, line3, line4, line5, line6,
-            line7, line8;
+            line7, line8, line9, line10;
     public void buildPaths() {
         line1 = follower
                 .pathBuilder()
@@ -58,7 +60,7 @@ public class RedSideAutoFar9 extends OpMode {
                 )
                 .setLinearHeadingInterpolation(
                         Math.toRadians(0),                // pi - 180°
-                        Math.toRadians(66.5)             // pi - 113.5°
+                        Math.toRadians(SHOOTING_ANGLE)             // pi - 113.5°
                 )
                 .build();
 
@@ -72,7 +74,7 @@ public class RedSideAutoFar9 extends OpMode {
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(66.5),
+                        Math.toRadians(SHOOTING_ANGLE),
                         Math.toRadians(0)
                 )
                 .build();
@@ -102,67 +104,93 @@ public class RedSideAutoFar9 extends OpMode {
                 )
                 .setLinearHeadingInterpolation(
                         Math.toRadians(0),
-                        Math.toRadians(66.5)
+                        Math.toRadians(SHOOTING_ANGLE)
                 )
                 .build();
 
-        line5 = follower
+        line5 = follower // starts here (mirrored about x = 72)
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(89.000, 14.000),    // 144-55
-                                new Pose(109.000, 29.000),   // 144-35
-                                new Pose(136.000, 28.000)    // 144-8
+                                new Pose(89.000, 14.000),
+                                new Pose(109.000, 20.000),
+                                new Pose(119.000, 14.000)
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(66.5),
-                        Math.toRadians(270)                 // pi - 270°
+                        Math.toRadians(SHOOTING_ANGLE),
+                        Math.toRadians(0.0)
                 )
                 .build();
 
-        line6 = follower
+        line6 = follower // goes forward (mirrored)
                 .pathBuilder()
                 .addPath(
                         new BezierLine(
-                                new Pose(136.000, 28.000),   // 144-8
-                                new Pose(136.000, 11.000)    // 144-8
+                                new Pose(119.000, 14.000),
+                                new Pose(135.000, 14.000)
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(270),
-                        Math.toRadians(270)
+                        Math.toRadians(0.0),
+                        Math.toRadians(0.0)
                 )
                 .build();
 
-        line7 = follower
+        line7 = follower // goes back (mirrored)
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Pose(135.000, 14.000),
+                                new Pose(119.000, 9.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(0.0),
+                        Math.toRadians(0.0)
+                )
+                .build();
+
+        line8 = follower // goes forward (mirrored)
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Pose(119.000, 9.000),
+                                new Pose(135.000, 9.000)
+                        )
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        line9 = follower // shooting position (mirrored)
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(136.000, 11.000),   // 144-8
-                                new Pose(109.000, 18.000),   // 144-35
-                                new Pose(89.000, 14.000)     // 144-55
+                                new Pose(135.000, 9.000),
+                                new Pose(124.000, 30.000),
+                                new Pose(89.000, 14.000)
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(270),
-                        Math.toRadians(66.5)
+                        Math.toRadians(0.0),
+                        Math.toRadians(SHOOTING_ANGLE)
                 )
                 .build();
 
-        line8 = follower
+        line10 = follower // park (mirrored)
                 .pathBuilder()
                 .addPath(
                         new BezierLine(
-                                new Pose(89.000, 14.000),    // 144-55
-                                new Pose(109.000, 9.000)     // 144-35
+                                new Pose(89.000, 14.000),
+                                new Pose(109.000, 15.000)
                         )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(66.5),
-                        Math.toRadians(0)                 // pi - 0°
+                        Math.toRadians(SHOOTING_ANGLE),
+                        Math.toRadians(0.0)
                 )
                 .build();
+
     }
 
 
@@ -257,7 +285,6 @@ public class RedSideAutoFar9 extends OpMode {
 
     @Override
     public void stop() {
-
         follower.breakFollowing();
         if (outtakeThread != null) {
             outtakeThread.interrupt();
@@ -289,19 +316,20 @@ public class RedSideAutoFar9 extends OpMode {
                 break;
 
             case -1:
-
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 10) {
-                    if (shooter.isAtTargetThreshold()) {
-                        transfer();
-                    } else if (shooter.getShooterVelocity() < 3100) {
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 6) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        } else if (shooter.getShooterVelocity() < LOWEST_POWER) {
+                            stopTransfer();
+                        }
+                    } else {
                         stopTransfer();
+                        out.block();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(1);
                     }
-                } else {
-                    stopTransfer();
-                    out.block();
-                    intake();
-                    outtakeBeamBreak.resetBallCount();
-                    setPathState(1);
                 }
                 break;
 
@@ -326,7 +354,7 @@ public class RedSideAutoFar9 extends OpMode {
 
             case 3:
                 if (!follower.isBusy()) {
-                    //stopIntake();
+                    stopIntake();
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.setMaxPower(1);
                     follower.followPath(line4);
@@ -350,7 +378,7 @@ public class RedSideAutoFar9 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 7)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < LOWEST_POWER) {
                             stopTransfer();
                         }
                     } else {
@@ -366,7 +394,7 @@ public class RedSideAutoFar9 extends OpMode {
             case 4:
                 if (!follower.isBusy()) {
                     intake();
-                    follower.setMaxPower(0.7);
+                    follower.setMaxPower(0.7); //0.7
                     follower.followPath(line5);
                     setPathState(5);
                 }
@@ -374,7 +402,7 @@ public class RedSideAutoFar9 extends OpMode {
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.7);
+                    follower.setMaxPower(0.7); //0.7
                     follower.followPath(line6);
                     setPathState(6);
                 }
@@ -383,27 +411,29 @@ public class RedSideAutoFar9 extends OpMode {
 
             case 6:
                 if (!follower.isBusy()) {
-                    //stopIntake();
-                    follower.setMaxPower(0.8);
+//                    stopIntake();
+                    follower.setMaxPower(0.8); //0.8
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     ballsToShoot = 3;
                     follower.followPath(line7);
-                    setPathState(-9);
+                    setPathState(7);
                 }
                 break;
 
-//            case 7:
-//                if (!follower.isBusy()) {
-//                    follower.followPath(line8);
-//                    setPathState(8);
-//                }
-//                break;
+            case 7:
+                if (!follower.isBusy()) {
+                    follower.followPath(line8);
+                    setPathState(8);
+                }
+                break;
 
-//            case 8:
-//                if (!follower.isBusy()) {
-//                    setPathState(-9);
-//                }
-//                break;
+            case 8:
+                if (!follower.isBusy()) {
+                    stopIntake();
+                    follower.followPath(line9);
+                    setPathState(-9);
+                }
+                break;
 
             case -9:
 //                if (intakeBeamBreak.isBeamStable()) {
@@ -415,7 +445,7 @@ public class RedSideAutoFar9 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7.5 && shootTime.getElapsedTimeSeconds() < 28.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < LOWEST_POWER) {
                             stopTransfer();
                         }
                     } else {
@@ -432,21 +462,19 @@ public class RedSideAutoFar9 extends OpMode {
                 if (!follower.isBusy()) {
                     shooter.eStop();
 
-                    follower.followPath(line8);
+                    follower.followPath(line10);
 
-                    //setPathState(10);
+                    setPathState(10);
                 }
                 break;
-//
-//            case 10:
-//                if (!follower.isBusy()) {
-//                    shooter.eStop();
-//                    follower.followPath(line11);
-//                    setPathState(11);
-//                    //follower.pausePathFollowing();
-//
-//                }
-//                break;
+
+            case 10:
+                if (!follower.isBusy()) {
+                    shooter.eStop();
+                    stopIntake();
+                    follower.pausePathFollowing();
+                }
+                break;
 //
 //            case 11:
 //                if (!follower.isBusy()) {
@@ -483,7 +511,7 @@ public class RedSideAutoFar9 extends OpMode {
     }
 
     private void transfer() {
-        in.transfer();
+        in.transfer(0.75);
         out.unblock();
         transfering = true;
     }

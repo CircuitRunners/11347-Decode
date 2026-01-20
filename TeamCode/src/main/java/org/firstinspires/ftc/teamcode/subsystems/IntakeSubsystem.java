@@ -40,9 +40,13 @@ public class IntakeSubsystem extends SubsystemBase {
         runTransfer(-0.5);
     }
 
+    public void transfer(double power) {
+        runIntake(0.85);
+        runTransfer(power);
+    }
     public void transfer() {
         runIntake(0.85);
-        runTransfer(1);
+        runTransfer(1.0);
     }
 
     public void stop() {

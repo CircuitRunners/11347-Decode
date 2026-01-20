@@ -270,19 +270,20 @@ public class BlueSideAutoFar9 extends OpMode {
                 break;
 
             case -1:
-
-                if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 7) {
-                    if (shooter.isAtTargetThreshold()) {
-                        transfer();
-                    } else if (shooter.getShooterVelocity() < 3100) {
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 6) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        } else if (shooter.getShooterVelocity() < 4100) {
+                            stopTransfer();
+                        }
+                    } else {
                         stopTransfer();
+                        out.block();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(1);
                     }
-                } else {
-                    stopTransfer();
-                    out.block();
-                    intake();
-                    outtakeBeamBreak.resetBallCount();
-                    setPathState(1);
                 }
                 break;
 
@@ -307,7 +308,7 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 3:
                 if (!follower.isBusy()) {
-//                    stopIntake();
+                    stopIntake();
                     shooter.setTargetRPM(FAR_SHOOTER_POWER);
                     follower.setMaxPower(1);
                     follower.followPath(line4);
@@ -329,7 +330,7 @@ public class BlueSideAutoFar9 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && (pathTimer.getElapsedTimeSeconds() < 5)) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < 4100) {
                             stopTransfer();
                         }
                     } else {
@@ -380,6 +381,7 @@ public class BlueSideAutoFar9 extends OpMode {
 
             case 8:
                 if (!follower.isBusy()) {
+                    stopIntake();
                     follower.followPath(line9);
                     setPathState(-9);
                 }
@@ -395,7 +397,7 @@ public class BlueSideAutoFar9 extends OpMode {
                     if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5 && shootTime.getElapsedTimeSeconds() < 28.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
-                        } else if (shooter.getShooterVelocity() < 3100) {
+                        } else if (shooter.getShooterVelocity() < 4100) {
                             stopTransfer();
                         }
                     } else {
@@ -464,7 +466,7 @@ public class BlueSideAutoFar9 extends OpMode {
     }
 
     private void transfer() {
-        in.transfer();
+        in.transfer(0.75);
         out.unblock();
         transfering = true;
     }

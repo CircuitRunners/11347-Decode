@@ -51,6 +51,7 @@ public class MainTeleOp extends CommandOpMode {
     // HEADING LOCK STUFF
     private boolean headingLockEnabled = false;
     public static double tP = 0.02;
+    private double METERS_TO_INCH = 39.37;
 
     // CONTROLLERS
     private GamepadEx driver, manipulator;
@@ -255,17 +256,18 @@ public class MainTeleOp extends CommandOpMode {
         );
     }
 
-//    public void updateCoordinatesWithAprilTag() {
-//        limelight.limelight.updateRobotOrientation(follower.getHeading());
-//        limelight.limelight.pipelineSwitch(0);
-//        LLResult result = limelight.limelight.getLatestResult();
-//        if (result != null && result.isValid()) {
-//            Pose3D mt1Pose = result.getBotpose();
-//            if (mt1Pose != null) {
-//                double finalX = (mt1Pose.getPosition().y * METERS_TO_INCH) + 72.0;
-//                double finalY = (-mt1Pose.getPosition().x * METERS_TO_INCH) + 72.0;
-//                follower.setPose(new Pose(finalX, finalY, follower.getHeading()));
-//                gamepad1.rumble(500);
-//            }
-//        }
+    public void updateCoordinatesWithAprilTag() {
+        limelight.limelight.updateRobotOrientation(follower.getHeading());
+        limelight.limelight.pipelineSwitch(0);
+        LLResult result = limelight.limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            Pose3D mt1Pose = result.getBotpose();
+            if (mt1Pose != null) {
+                double finalX = (mt1Pose.getPosition().y * METERS_TO_INCH) + 72.0;
+                double finalY = (-mt1Pose.getPosition().x * METERS_TO_INCH) + 72.0;
+                follower.setPose(new Pose(finalX, finalY, follower.getHeading()));
+                gamepad1.rumble(500);
+            }
+        }
+    }
 }
