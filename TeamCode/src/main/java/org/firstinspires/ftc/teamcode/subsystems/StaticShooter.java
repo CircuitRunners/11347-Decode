@@ -237,6 +237,8 @@ public class StaticShooter extends SubsystemBase {
         return currMotorRPM;
     }
 
+
+
     /**
      * Gets shooter motor current velocity
      * @return Returns motor voltage

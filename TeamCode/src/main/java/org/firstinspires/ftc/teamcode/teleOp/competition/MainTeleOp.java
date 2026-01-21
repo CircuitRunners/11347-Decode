@@ -56,6 +56,7 @@ public class MainTeleOp extends CommandOpMode {
     // CONTROLLERS
     private GamepadEx driver, manipulator;
 
+
     @Override
     public void initialize() {
         schedule(new BulkCacheCommand(hardwareMap));
@@ -85,14 +86,14 @@ public class MainTeleOp extends CommandOpMode {
         // Click bumper once to activate intake at full speed
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
-                    shooter.setTargetRPM(4500);
+                    shooter.setTargetRPM(4600);
                     out.aimScoring();
                 }));
 
         // Click bumper once to activate intake at close speed
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(()-> {
-                    shooter.setTargetRPM(3500);
+                    shooter.setTargetRPM(3700);
                     out.aimClose();
                 }));
 
@@ -114,7 +115,8 @@ public class MainTeleOp extends CommandOpMode {
         // Transfering Command
         // Click to toggle on and off transfering
         driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new TransferCommand(in, out, driver));
+                .whenPressed(new TransferCommand(in, out, driver, shooter));
+
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(()-> {
