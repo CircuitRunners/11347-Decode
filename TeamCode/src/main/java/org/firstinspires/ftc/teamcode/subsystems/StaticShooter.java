@@ -4,9 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.pedropathing.math.MathFunctions;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
+import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -30,6 +34,7 @@ public class StaticShooter extends SubsystemBase {
     private static double TICKS_PER_REV = 28;          // motor encoder ticks per revolution
     private boolean active;
 
+
     // --- PIDF Coefficients ---
     //working value 35 on October 9th, 2025
 /*    public double kP = 35.0;
@@ -51,18 +56,19 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Initialises the shooter in the hardwareMap, sets default shooter values
-     * @param hardwareMap pulls HardwareMap from teleOp class
-     *                    to initialise motor
-     * @param telemetry Allows the class to add telemetry to the phone
+     *
+     * @param hardwareMap      pulls HardwareMap from teleOp class
+     *                         to initialise motor
+     * @param telemetry        Allows the class to add telemetry to the phone
      * @param defaultTargetRPM Sets the default target RPM of the shooter
-     *                        Set to the initial target RPM of your
-     *                        shooter
-     * @param defaultMotorRPM Sets the default RPM of the motor
-     *                       Set to the RPM of the motor being used
+     *                         Set to the initial target RPM of your
+     *                         shooter
+     * @param defaultMotorRPM  Sets the default RPM of the motor
+     *                         Set to the RPM of the motor being used
      * @param defaultGearRatio Sets the default shooter gear ratio
-     *                        Set to the gear ratio between the motor and shooterwheel
-     * @param defaultTicks Sets the default ticks of the motor
-     *                    Set to the encoder ticks of your motor
+     *                         Set to the gear ratio between the motor and shooterwheel
+     * @param defaultTicks     Sets the default ticks of the motor
+     *                         Set to the encoder ticks of your motor
      */
     public StaticShooter(HardwareMap hardwareMap, Telemetry telemetry, double defaultTargetRPM,
                          double defaultMotorRPM, double defaultGearRatio, double defaultTicks) {
@@ -87,7 +93,6 @@ public class StaticShooter extends SubsystemBase {
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
-
         // Configs defaults
         setTargetRPM(defaultTargetRPM);
         setMotorRPM(defaultMotorRPM);
@@ -107,8 +112,10 @@ public class StaticShooter extends SubsystemBase {
     }
 
     // --- PIDF ---
+
     /**
      * Sets shooter PIDF coefficients manually
+     *
      * @param kf Set to a low value, just enough that the shooter wheel
      *           begins to rotate
      * @param kp Increase kP after kF until the shooter wheel reaches the target speed
@@ -125,15 +132,19 @@ public class StaticShooter extends SubsystemBase {
         applyPIDF();
     }
 
-    /** Applies current shooter velocity PIDF coefficients */
+    /**
+     * Applies current shooter velocity PIDF coefficients
+     */
     public void applyPIDF() {
         shooter1.setVelocityPIDFCoefficients(kP, kI, kD, kF);
         shooter2.setVelocityPIDFCoefficients(kP, kI, kD, kF);
     }
 
     // --- Constants Control ---
+
     /**
      * Changes the target RPM of the shooter
+     *
      * @param targetRPM Set to the target RPM of the shooter
      */
     public void setTargetRPM(double targetRPM) {
@@ -143,6 +154,7 @@ public class StaticShooter extends SubsystemBase {
     /**
      * Returns the target RPM of the shooter, used to check if velo
      * is within tolerance
+     *
      * @return returns the target RPM of the shooter
      */
     public double getTargetRPM() {
@@ -151,8 +163,8 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Changes the RPM of the motor
-     * @param motorRPM Set to the RPM of the motor
      *
+     * @param motorRPM Set to the RPM of the motor
      */
     public void setMotorRPM(double motorRPM) {
         MOTOR_RPM = motorRPM;
@@ -160,11 +172,12 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Changes the gear ratio between the motor and the shooter
+     *
      * @param gearRatio Set to the gear ratio used between the
      *                  motor and shooter
-     *      1.0 is a 1:1 gear ratio
-     *      2.5 is a 2.5:1 gear increase
-     *      0.5 is a 0.5:1 gear reduction
+     *                  1.0 is a 1:1 gear ratio
+     *                  2.5 is a 2.5:1 gear increase
+     *                  0.5 is a 0.5:1 gear reduction
      */
     public void setGearRatio(double gearRatio) {
         GEAR_RATIO = gearRatio;
@@ -172,6 +185,7 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Returns the current gear ratio of the shooter
+     *
      * @return returns the current GEAR_RATIO of the shooter system
      */
     public double getGearRatio() {
@@ -181,6 +195,7 @@ public class StaticShooter extends SubsystemBase {
     /**
      * Changes the Ticks Per Revolution of the motor
      * Called Encoder Resolution on gobilda website
+     *
      * @param TicksPerRev Set to the Ticks per rev of the motor
      *                    being used
      */
@@ -190,6 +205,7 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Returns the current Ticks Per Rev of the shooter
+     *
      * @return returns the TICKS_PER_REV of the shooter flywheel
      */
     public double getTicksPerRev() {
@@ -199,7 +215,7 @@ public class StaticShooter extends SubsystemBase {
     /**
      * Calculates ticks per second based on target RPM
      * Sets the target velocity
-     * */
+     */
     public void update() {
 //        double targetTicksPerSec = ((TARGET_RPM / GEAR_RATIO) * TICKS_PER_REV) / 60;
         double targetMotorRPM = TARGET_RPM / GEAR_RATIO;
@@ -210,7 +226,9 @@ public class StaticShooter extends SubsystemBase {
         active = Math.abs(getTargetRPM()) > 0;
     }
 
-    /** Stops all shooter motion immediately. */
+    /**
+     * Stops all shooter motion immediately.
+     */
     public void eStop() {
         shooter1.setPower(0);
         shooter1.setVelocity(0);
@@ -220,8 +238,9 @@ public class StaticShooter extends SubsystemBase {
 
     /**
      * Gets shooter current velocity
+     *
      * @return Returns current shooter RPM based on the
-     *         motor rpm, ticks per rev, and gear ratio
+     * motor rpm, ticks per rev, and gear ratio
      */
     public double getShooterVelocity() {
 //        double currTicksPerSec = shooter1.getVelocity(); // ticks/s of motor
@@ -238,9 +257,9 @@ public class StaticShooter extends SubsystemBase {
     }
 
 
-
     /**
      * Gets shooter motor current velocity
+     *
      * @return Returns motor voltage
      */
     public double getMotorVoltage() {
@@ -253,5 +272,12 @@ public class StaticShooter extends SubsystemBase {
 
     public boolean isAtTargetThreshold() {
         return ((getShooterVelocity() > (getTargetRPM() - 200)) && getShooterVelocity() != 0);
+    }
+
+
+
+
+    public static double getHoodTicksFromDegrees(double degrees){
+        return degrees/180.0;
     }
 }

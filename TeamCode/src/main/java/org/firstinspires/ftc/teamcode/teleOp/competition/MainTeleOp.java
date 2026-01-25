@@ -7,6 +7,8 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.MathFunctions;
+import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -30,6 +32,7 @@ import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 
 import com.pedropathing.follower.Follower;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.Locale;
 
@@ -55,7 +58,27 @@ public class MainTeleOp extends CommandOpMode {
 
     // CONTROLLERS
     private GamepadEx driver, manipulator;
+    private final double RED_GOAL_X = 127.0;
+    private final double BLUE_GOAL_X = 17.0;
+    private final double GOAL_Y = 136.0;
 
+
+    public static final double GRAVITY = 386.09; // in/s^2
+
+    // Physical hood limits (measure these!)
+    //Auto Adjusting Constants
+    public static Pose GOAL_POS_RED = new Pose(138,138);
+    public static Pose GOAL_POS_BLUE = new Pose(6, 138);
+    public static double SCORE_HEIGHT = 25;
+    public static double SCORE_ANGLE = Math.toRadians(-30);
+    public static double PASS_THROUGH_POINT_RADIUS =5;
+    public static double HOOD_MAX_ANGLE = Math.toRadians(80);
+    public static double HOOD_MIN_ANGLE = Math.toRadians(0);
+    public static double kP = 5.038;
+    public static double hoodP2 = 1;
+
+    private double hoodAngle = 0;
+    private double flywheelSpeed = 0;
 
     @Override
     public void initialize() {
@@ -125,7 +148,7 @@ public class MainTeleOp extends CommandOpMode {
                 AngleUnit.RADIANS, Math.toRadians(0));
         //pinpoint.setPosition(newPose);
 
-        follower.setPose(new Pose(8,8, Math.toRadians(0)));
+        follower.setPose(new Pose(72,72, Math.toRadians(0)));
 
                 }));
         telemetry.addLine("Pinpoint Reset - Position now 72,72 (Middle)!");
@@ -150,6 +173,14 @@ public class MainTeleOp extends CommandOpMode {
 
         out.aiming(gamepad1.cross, gamepad1.triangle);
 
+        Pose2D p = pinpoint.getPosition();
+        double x = p.getX(DistanceUnit.INCH);
+        double y = p.getY(DistanceUnit.INCH);
+        double heading = p.getHeading(AngleUnit.RADIANS);
+
+        calculateHoodPos(x, y, heading, follower.getVelocity());
+
+
         double forward = driver.getLeftY(); // Forwards/backwards
         double right = driver.getLeftX(); // Strafe
         double rotate = driver.getRightX(); // Rotation
@@ -171,6 +202,19 @@ public class MainTeleOp extends CommandOpMode {
         } else {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.RED);
         }
+
+        double wheelDiameter = 4;
+        double gearRatio = 40.0 / 52.0;
+
+        double wheelRPM = (flywheelSpeed * 60) / (Math.PI * wheelDiameter);
+        double motorRPM = wheelRPM * gearRatio * kP;
+
+
+
+        shooter.setTargetRPM(motorRPM);
+        //out.setAim(hoodAngle);
+        //double hoodPos = (0.25 - Range.scale(hoodAngle, HOOD_MIN_ANGLE, HOOD_MAX_ANGLE, 0.0, 0.25)) * hoodP2;
+        double hoodPos = (0.25 - Range.scale(hoodAngle, HOOD_MIN_ANGLE, HOOD_MAX_ANGLE, 0.0, 0.45));
 
         String data = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
@@ -226,6 +270,8 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
         telemetry.addData("Soft limit On?", aimServoLimit);
+        telemetry.addData("Hood pos", hoodPos);
+        telemetry.addData("Shooter Predicted Vel",motorRPM);
         telemetry.update();
     }
 
@@ -253,8 +299,8 @@ public class MainTeleOp extends CommandOpMode {
         pinpoint.setOffsets(-28.042, -147.012, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED
         );
     }
 
@@ -272,4 +318,49 @@ public class MainTeleOp extends CommandOpMode {
             }
         }
     }
+
+    public void calculateHoodPos(double robotX, double robotY, double robotHeading, Vector robotVelocity) {
+        // Horizontal distance to goal
+        double dx = GOAL_POS_RED.getX() - robotX;
+        double dy = GOAL_POS_RED.getY() - robotY;
+        double distanceToGoal = Math.hypot(dx, dy);
+        double angleToGoal = Math.atan(dy / dx);
+        Vector robotToGoalVector = new Vector(distanceToGoal, angleToGoal);
+
+        double g = 32.174 * 12;
+        double x = robotToGoalVector.getMagnitude() - PASS_THROUGH_POINT_RADIUS;
+        double y = SCORE_HEIGHT;
+        double a = SCORE_ANGLE;
+
+        //calculuate initial launch components
+        hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), HOOD_MIN_ANGLE, HOOD_MAX_ANGLE);
+
+        flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y)));
+
+//        //get robot velocity and conver it into parallel and perpendicular components
+//        double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
+//
+//        double parallelComponent = -Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
+//        double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
+//
+//        //velocity compensation variables
+//        double vz = flywheelSpeed * Math.sin(hoodAngle);
+//        double time = x / (flywheelSpeed * Math.cos(hoodAngle));
+//        double ivr = x / time + parallelComponent;
+//        double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
+//        double ndr = nvr * time;
+//
+//        //recalculuate launch components
+//        hoodAngle = MathFunctions.clamp(Math.atan(vz / nvr), HOOD_MIN_ANGLE, HOOD_MAX_ANGLE);
+//
+//        flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle), 2) * (ndr * Math.tan(hoodAngle) - y)));
+
+        //update robot position
+
+
+    }
+
+
+
+
 }
