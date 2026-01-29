@@ -6,39 +6,37 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.auto.BulkCacheCommand;
+import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.TransferCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.BeamBreakHelper;
-import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.subsystems.GobildaRGBIndicatorHelper;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrivebase;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.StaticShooter;
 import org.firstinspires.ftc.teamcode.support.AlliancePresets;
-
-import org.firstinspires.ftc.teamcode.commands.TransferCommand;
-import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
-
-import com.pedropathing.follower.Follower;
-import com.qualcomm.robotcore.util.Range;
 
 import java.util.Locale;
 
 @Config
 @TeleOp(group="1")
-public class MainTeleOp extends CommandOpMode {
+public class MainTeleOpBLUE extends CommandOpMode {
     // HARDWARE
     private StaticShooter shooter;
     private MecanumDrivebase drive;
@@ -58,27 +56,31 @@ public class MainTeleOp extends CommandOpMode {
 
     // CONTROLLERS
     private GamepadEx driver, manipulator;
-    private final double RED_GOAL_X = 127.0;
-    private final double BLUE_GOAL_X = 17.0;
-    private final double GOAL_Y = 136.0;
+    //VELOCITY AND HOOD CALCULATIONS (TUNED)
 
-
-    public static final double GRAVITY = 386.09; // in/s^2
-
-    // Physical hood limits (measure these!)
-    //Auto Adjusting Constants
-    public static Pose GOAL_POS_RED = new Pose(138,138);
-    public static Pose GOAL_POS_BLUE = new Pose(6, 138);
-    public static double SCORE_HEIGHT = 25;
-    public static double SCORE_ANGLE = Math.toRadians(-30);
-    public static double PASS_THROUGH_POINT_RADIUS =5;
-    public static double HOOD_MAX_ANGLE = Math.toRadians(80);
-    public static double HOOD_MIN_ANGLE = Math.toRadians(0);
-    public static double kP = 5.038;
-    public static double hoodP2 = 1;
-
+    private Pose GOAL_POS_BLUE = new Pose(138, 6);
+    private double SCORE_HEIGHT = 25;
+    private double SCORE_ANGLE = Math.toRadians(-30);
+    private double PASS_THROUGH_POINT_RADIUS =5;
+    private double HOOD_MAX_ANGLE = Math.toRadians(67);
+    private double HOOD_MIN_ANGLE = Math.toRadians(0);
+    private double wheelDiameter = 3.21;
+    private double maxHoodTicks = 0.5;
     private double hoodAngle = 0;
     private double flywheelSpeed = 0;
+    public static boolean usePhysics = false;
+
+    //AUTO TURN STUFF
+    public static boolean runAutoTurn = false;
+    public static double headingSetPoint = 113.5;
+    public static double autoTurnKP = 0.9;
+    public static double maxTurnVelocity = 0.7; //need to use this more/tune this so i can get more agressive P
+    private double error = 0;
+    public static double autoTurnErrorMax = 11;
+    public static double autoTurnKD = 0.38;
+    public static double goalOffset = 0;
+    private double lastError = 0.0;
+    private double lastTime = 0.0;   // seconds
 
     @Override
     public void initialize() {
@@ -143,10 +145,6 @@ public class MainTeleOp extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(()-> {
-        Pose2D newPose = new Pose2D(DistanceUnit.INCH,
-                8,8,
-                AngleUnit.RADIANS, Math.toRadians(0));
-        //pinpoint.setPosition(newPose);
 
         follower.setPose(new Pose(72,72, Math.toRadians(0)));
 
@@ -185,6 +183,24 @@ public class MainTeleOp extends CommandOpMode {
         double right = driver.getLeftX(); // Strafe
         double rotate = driver.getRightX(); // Rotation
 
+        driver.getGamepadButton(GamepadKeys.Button.B)
+                .whenPressed(new InstantCommand(()-> {
+                    //pinpoint.resetPosAndIMU();
+                    Pose2D p2 = pinpoint.getPosition();
+                    double x2 = p2.getX(DistanceUnit.INCH);
+                    double y2 = p2.getY(DistanceUnit.INCH);
+                    pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, x2,y2, AngleUnit.RADIANS, 0.0));
+                }));
+
+        driver.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(()-> {
+                    runAutoTurn = true;
+                }))
+                .whenReleased(new InstantCommand(()-> {
+                    runAutoTurn = false;
+                }));
+
+
 //        if (headingLockEnabled && limelight.hasValidTarget()) {
 //            LLResult result = limelight.getLatest();
 //            if (result != null && result.isValid()) {
@@ -193,6 +209,39 @@ public class MainTeleOp extends CommandOpMode {
 //                rotate = finalRotation;
 //            }
 //        }
+
+
+        //auto turn stuff
+        if(runAutoTurn){
+            //yes i used gpt bro i dont know this stuff
+            double currentTime = System.nanoTime() * 1e-9; // seconds
+            double dt = currentTime - lastTime; //new
+            headingSetPoint = getRobotPositionAngle(x, y);
+
+            error = headingSetPoint - Math.toDegrees(heading);
+            if (Math.abs(error-180) <autoTurnErrorMax){
+                error = 0;
+            }
+            else {
+
+                if (error > 180) {
+                    error -= 360;
+                } else if (error < -180) {
+                    error += 360;
+                }
+            }
+
+            double derivative = 0;
+            if (dt > 0) {
+                derivative = (error - lastError) / dt;
+            } //new
+
+            rotate = (autoTurnKP * error) + (autoTurnKD * derivative); //new
+            rotate = Math.min(Math.max(rotate, -maxTurnVelocity), maxTurnVelocity);
+
+            lastError = error;
+            lastTime = currentTime; //new
+        }
 
         Pose2D pose;
         pose = driveFieldRelative(forward, right, rotate);
@@ -203,19 +252,25 @@ public class MainTeleOp extends CommandOpMode {
             rgbHelper.setColour(GobildaRGBIndicatorHelper.Colour.RED);
         }
 
-        double wheelDiameter = 4;
+
+
+
+        //Velocity and hood stuff
+
         double gearRatio = 40.0 / 52.0;
 
-        double wheelRPM = (flywheelSpeed * 60) / (Math.PI * wheelDiameter);
-        double motorRPM = wheelRPM * gearRatio * kP;
+        double wheelRPM = (flywheelSpeed * 60.0) / (Math.PI * (wheelDiameter/4.0));
+        double motorRPM = wheelRPM * gearRatio;
+
+        double hoodPos = (maxHoodTicks - Range.scale(hoodAngle, HOOD_MIN_ANGLE, HOOD_MAX_ANGLE, 0.0, 0.45));
+
+        if (usePhysics) {
+            shooter.setTargetRPM(motorRPM);
+            out.setAim(hoodPos);
+        }
 
 
-
-        shooter.setTargetRPM(motorRPM);
-        //out.setAim(hoodAngle);
-        //double hoodPos = (0.25 - Range.scale(hoodAngle, HOOD_MIN_ANGLE, HOOD_MAX_ANGLE, 0.0, 0.25)) * hoodP2;
-        double hoodPos = (0.25 - Range.scale(hoodAngle, HOOD_MIN_ANGLE, HOOD_MAX_ANGLE, 0.0, 0.45));
-
+        //data
         String data = String.format(Locale.US,
                 "{X: %.3f, Y: %.3f, H: %.3f}",
                 pose.getX(DistanceUnit.INCH),
@@ -231,10 +286,7 @@ public class MainTeleOp extends CommandOpMode {
 
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(()-> {
-                    pinpoint.resetPosAndIMU();
-                }));
+
 
         if (aimServoLimit) {
             if (out.getAimPos() > 0.55) {
@@ -272,6 +324,9 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Soft limit On?", aimServoLimit);
         telemetry.addData("Hood pos", hoodPos);
         telemetry.addData("Shooter Predicted Vel",motorRPM);
+        telemetry.addData("Running auto lock", runAutoTurn);
+        telemetry.addData("Heading variable (temp)", Math.toDegrees(heading));
+        telemetry.addData("error?)", error);
         telemetry.update();
     }
 
@@ -283,7 +338,7 @@ public class MainTeleOp extends CommandOpMode {
         double robotAngle = Math.toRadians(pos.getHeading(AngleUnit.DEGREES));
         double theta = Math.atan2(forward, right);
         double r = Math.hypot(forward, right);
-        theta = org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+        theta = AngleUnit
                 .normalizeRadians(theta - robotAngle);
 
         double newForward = r * Math.sin(theta);
@@ -321,8 +376,8 @@ public class MainTeleOp extends CommandOpMode {
 
     public void calculateHoodPos(double robotX, double robotY, double robotHeading, Vector robotVelocity) {
         // Horizontal distance to goal
-        double dx = GOAL_POS_RED.getX() - robotX;
-        double dy = GOAL_POS_RED.getY() - robotY;
+        double dx = GOAL_POS_BLUE.getX() - robotX;
+        double dy = GOAL_POS_BLUE.getY() - robotY;
         double distanceToGoal = Math.hypot(dx, dy);
         double angleToGoal = Math.atan(dy / dx);
         Vector robotToGoalVector = new Vector(distanceToGoal, angleToGoal);
@@ -336,7 +391,7 @@ public class MainTeleOp extends CommandOpMode {
         hoodAngle = MathFunctions.clamp(Math.atan(2 * y / x - Math.tan(a)), HOOD_MIN_ANGLE, HOOD_MAX_ANGLE);
 
         flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle), 2) * (x * Math.tan(hoodAngle) - y)));
-
+//
 //        //get robot velocity and conver it into parallel and perpendicular components
 //        double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
 //
@@ -344,7 +399,7 @@ public class MainTeleOp extends CommandOpMode {
 //        double perpendicularComponent = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 //
 //        //velocity compensation variables
-//        double vz = flywheelSpeed * Math.sin(hoodAngle);
+//        double vz = 1flywheelSpeed * Math.sin(hoodAngle);
 //        double time = x / (flywheelSpeed * Math.cos(hoodAngle));
 //        double ivr = x / time + parallelComponent;
 //        double nvr = Math.sqrt(ivr * ivr + perpendicularComponent * perpendicularComponent);
@@ -359,7 +414,13 @@ public class MainTeleOp extends CommandOpMode {
 
 
     }
-
+    public double getRobotPositionAngle(double robotX, double robotY){
+        //This function is special and should not be touched
+        double dxx = GOAL_POS_BLUE.getX() - robotX + goalOffset;
+        double dyy = GOAL_POS_BLUE.getY() - robotY;
+        double angleToGoal = Math.atan(dyy / dxx);
+        return (Math.toDegrees(angleToGoal) + 180);
+    }
 
 
 
