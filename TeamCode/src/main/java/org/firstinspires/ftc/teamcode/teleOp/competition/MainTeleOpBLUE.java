@@ -76,14 +76,14 @@ public class MainTeleOpBLUE extends CommandOpMode {
 
     //AUTO TURN STUFF
     public static boolean runAutoTurn = false;
-    public static double headingSetPoint = -44;
-    public static double maxTurnVelocity = 0.75; //need to use this more/tune this so i can get more agressive P
+    public static double headingSetPoint = 0;
+    public static double maxTurnVelocity = 0.8; //need to use this more/tune this so i can get more agressive P
     private double error = 0;
-    public static double autoTurnErrorMax = 3;
-    public static double autoTurnKP = 0.60;
+    public static double autoTurnErrorMax = 3.5;
+    public static double autoTurnKP = 0.025;
     public static double autoTurnKI = 0.06;
-    public static double autoTurnKD = 0.54;
-    public static double autoTurnKF = 1;
+    public static double autoTurnKD = 0.0052;
+    public static double autoTurnKF = 0.3;
     public static double goalOffset = 0;
     private double integral = 0;
     private double maxIntegral = 20; // clamp
@@ -230,17 +230,14 @@ public class MainTeleOpBLUE extends CommandOpMode {
             headingSetPoint = getRobotPositionAngle(x, y);
 
             error = (Math.toDegrees(heading)) - headingSetPoint;
-            if (Math.abs(error) <autoTurnErrorMax){
-                error = 0;
-            }
-            else {
+
 
                 if (error > 180) {
                     error -= 360;
                 } else if (error < -180) {
                     error += 360;
                 }
-            }
+
 
 
             //kd stuff
@@ -264,6 +261,9 @@ public class MainTeleOpBLUE extends CommandOpMode {
             }
 
             rotate = (autoTurnKP * error) + (autoTurnKI * integral) + (autoTurnKD * derivative) + feedforward; //new
+            if (Math.abs(error) < autoTurnErrorMax){
+                rotate = 0;
+            }
             rotate = Math.min(Math.max(rotate, -maxTurnVelocity), maxTurnVelocity);
 
             lastError = error;
@@ -353,7 +353,7 @@ public class MainTeleOpBLUE extends CommandOpMode {
         telemetry.addData("Shooter Predicted Vel",motorRPM);
         telemetry.addData("Running auto lock", runAutoTurn);
         telemetry.addData("Heading variable (temp)", Math.toDegrees(heading));
-        telemetry.addData("error?)", error);
+        telemetry.addData("error?)", headingSetPoint);
         telemetry.update();
 
         TelemetryPacket packet = new TelemetryPacket();

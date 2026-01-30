@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.auto.AutoPaths.BlueAutos;
-//mathew is an idiot and sucks at programming - Justin Racel
+
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
@@ -32,7 +32,7 @@ public class BlueSideClose12 extends OpMode {
     private int pathState = 0;
     private int ballsToShoot;
 
-    private int CLOSE_SHOOTER_POWER = 3500;
+    private int CLOSE_SHOOTER_POWER = 3700;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
@@ -45,7 +45,7 @@ public class BlueSideClose12 extends OpMode {
     private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(33.50, 135.5, Math.toRadians(180));
+    private final Pose startPose = new Pose(110.0, 135.5, Math.toRadians(0));
 
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8, line9, line10, line11, line12, line13;
@@ -223,7 +223,7 @@ public class BlueSideClose12 extends OpMode {
 
         outtakeThread.start();
         pathTimer.resetTimer();
-        setPathState(-2);
+        setPathState(0);
     }
 
     @Override
@@ -234,15 +234,8 @@ public class BlueSideClose12 extends OpMode {
         limelight.update();
         autonomousPathUpdate();
 
-//        if (headingLockEnabled && limelight.hasValidTarget()) {
-//            LLResult result = limelight.getLatest();
-//            if (result != null && result.isValid()) {
-//                double finalRotation = result.getTxNC() * 0.02;
-//                finalRotation = Math.max(-0.4, Math.min(finalRotation, 0.4));
-//                follower.setRotation(finalRotation);
-//            }
-//        }
-
+        telemetry.addLine("----  RED Side Auto Close 12  ----");
+        telemetry.addLine();
         telemetry.addData("Follower busy?", follower.isBusy());
         telemetry.addData("Path State: ", pathState);
         telemetry.addData("Shooter Velo: ", shooter.getShooterVelocity());
@@ -273,139 +266,83 @@ public class BlueSideClose12 extends OpMode {
 
     private void autonomousPathUpdate() {
         switch (pathState) {
-            case -2:
+            case 0:
                 if (!follower.isBusy()) {
                     follower.setMaxPower(0.87);
                     shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                     out.aimClose();
-                    setPathState(0);
-                }
-                break;
-
-            case 0:
-                if (!follower.isBusy()) {
-                    follower.followPath(line1);
-                    shootTime.resetTimer();
-                    setPathState(-1);
-                }
-                break;
-
-            case -1:
-                if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3.5) {
-                        if (shooter.isAtTargetThreshold()) {
-                            transfer();
-                        }
-                    } else {
-                        stopTransfer();
-                        out.block();
-                        intake();
-                        outtakeBeamBreak.resetBallCount();
-                        setPathState(1);
-                    }
+                    setPathState(1);
                 }
                 break;
 
             case 1:
                 if (!follower.isBusy()) {
-                    intake();
-                    follower.followPath(line2);
+                    follower.followPath(line1);
+                    shootTime.resetTimer();
                     setPathState(2);
                 }
                 break;
 
             case 2:
                 if (!follower.isBusy()) {
-                    follower.followPath(line3);
-                    ballsToShoot = 3;
-                    setPathState(3);
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3.5 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
+                        setPathState(3);
+                    }
                 }
                 break;
-
 
             case 3:
                 if (!follower.isBusy()) {
-                    //stopIntake();
-                    shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
-                    follower.setMaxPower(0.67);
-                    stopIntake();
-                    follower.followPath(line4);
-                    setPathState(-4);
-                }
-                break;
-
-            case -4:
-                if (!follower.isBusy()) {
-                    follower.followPath(line5);
+                    follower.followPath(line2);
                     setPathState(4);
                 }
                 break;
 
             case 4:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.87);
-                    follower.followPath(line6);
+                    follower.followPath(line3);
+                    ballsToShoot = 3;
                     setPathState(5);
                 }
                 break;
 
+
             case 5:
-                //                if (intakeBeamBreak.isBeamStable()) {
-//                    ballsToShoot = 3;
-//                } else {
-////                    if (2 >= intakeBeamBreak.getBallCount()){
-////                        ballsToShoot = intakeBeamBreak.getBallCount();
-////                    }
-//                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-//                }
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
-                        if (shooter.isAtTargetThreshold()) {
-                            transfer();
-                        }
-                    } else {
-                        stopTransfer();
-                        out.block();
-                        intake();
-                        outtakeBeamBreak.resetBallCount();
-                        setPathState(6);
-                    }
+                    shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
+                    follower.setMaxPower(0.67);
+                    stopIntake();
+                    follower.followPath(line4);
+                    setPathState(6);
                 }
                 break;
 
             case 6:
                 if (!follower.isBusy()) {
-                    //shooter.setTargetRPM(3400);
-                    ballsToShoot = 3;
-                    intake();
-                    follower.followPath(line7);
+                    follower.followPath(line5);
                     setPathState(7);
                 }
                 break;
 
             case 7:
                 if (!follower.isBusy()) {
-                    follower.followPath(line8);
+                    follower.setMaxPower(0.87);
+                    follower.followPath(line6);
                     setPathState(8);
                 }
                 break;
 
             case 8:
-                shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                 if (!follower.isBusy()) {
-                    follower.followPath(line9);
-                    setPathState(-9);
-                }
-                break;
-
-            case -9:
-//                if (intakeBeamBreak.isBeamStable()) {
-//                    ballsToShoot = 3;
-//                } else {
-//                    ballsToShoot = Range.clip(intakeBeamBreak.getBallCount(), 0, 2);
-//                }
-                if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3 && pathTimer.getElapsedTimeSeconds() > 0.8) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
@@ -414,7 +351,6 @@ public class BlueSideClose12 extends OpMode {
                         out.block();
                         intake();
                         outtakeBeamBreak.resetBallCount();
-//                        shooter.eStop();
                         setPathState(9);
                     }
                 }
@@ -422,58 +358,89 @@ public class BlueSideClose12 extends OpMode {
 
             case 9:
                 if (!follower.isBusy()) {
-                    //shooter.eStop();
-                    intake();
                     ballsToShoot = 3;
-                    follower.followPath(line10);
+                    follower.followPath(line7);
                     setPathState(10);
                 }
                 break;
 
             case 10:
                 if (!follower.isBusy()) {
-
-                    follower.followPath(line11);
+                    follower.followPath(line8);
                     setPathState(11);
-                    //
-
                 }
                 break;
 
             case 11:
-
+                shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                 if (!follower.isBusy()) {
                     stopIntake();
-                    follower.followPath(line12);
-
+                    follower.followPath(line9);
                     setPathState(12);
                 }
                 break;
+
             case 12:
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3 && pathTimer.getElapsedTimeSeconds() > 0.8) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
                     } else {
                         stopTransfer();
                         out.block();
-                        //intake();
-                        //outtakeBeamBreak.resetBallCount();
-                        stopIntake();
-                        shooter.eStop();
+                        intake();
+                        outtakeBeamBreak.resetBallCount();
                         setPathState(13);
                     }
                 }
                 break;
+
             case 13:
                 if (!follower.isBusy()) {
-                    follower.followPath(line13);
-
+                    ballsToShoot = 3;
+                    follower.followPath(line10);
                     setPathState(14);
                 }
                 break;
+
             case 14:
+                if (!follower.isBusy()) {
+                    follower.followPath(line11);
+                    setPathState(15);
+                }
+                break;
+
+            case 15:
+
+                if (!follower.isBusy()) {
+                    stopIntake();
+                    follower.followPath(line12);
+
+                    setPathState(16);
+                }
+                break;
+            case 16:
+                if (!follower.isBusy()) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3.5 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                        if (shooter.isAtTargetThreshold()) {
+                            transfer();
+                        }
+                    } else {
+                        stopTransfer();
+                        out.block();
+                        shooter.eStop();
+                        setPathState(17);
+                    }
+                }
+                break;
+            case 17:
+                if (!follower.isBusy()) {
+                    follower.followPath(line13);
+                    setPathState(18);
+                }
+                break;
+            case 18:
                 if (!follower.isBusy()) {
                     shooter.eStop();
                     follower.pausePathFollowing();
