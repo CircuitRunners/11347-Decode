@@ -21,14 +21,14 @@ class TransferCommand(
         if (driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).get()) {
             if (shooter.targetRPM > 4000) {
                 if (shooter.getShooterVelocity() > 4200) {
-                    inSubsystem.transfer()
+                    inSubsystem.transfer(0.8)
                     out.unblock();
                 }
                 else{
                     out.block()
                 }
             } else {
-                inSubsystem.transfer()
+                inSubsystem.transfer(0.8)
                 out.unblock();
             }
             //inSubsystem.transfer(0.75)

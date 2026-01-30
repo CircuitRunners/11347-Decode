@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.teleOp.competition;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -47,6 +50,7 @@ public class MainTeleOpBLUE extends CommandOpMode {
     private LimelightSubsystem limelight;
     private GobildaRGBIndicatorHelper rgbHelper;
     private BeamBreakHelper intakeBeamBreak;
+    private FtcDashboard dash;
     private boolean aimServoLimit = true;
 
     // HEADING LOCK STUFF
@@ -72,13 +76,17 @@ public class MainTeleOpBLUE extends CommandOpMode {
 
     //AUTO TURN STUFF
     public static boolean runAutoTurn = false;
-    public static double headingSetPoint = 113.5;
-    public static double autoTurnKP = 0.9;
-    public static double maxTurnVelocity = 0.7; //need to use this more/tune this so i can get more agressive P
+    public static double headingSetPoint = -44;
+    public static double maxTurnVelocity = 0.75; //need to use this more/tune this so i can get more agressive P
     private double error = 0;
-    public static double autoTurnErrorMax = 11;
-    public static double autoTurnKD = 0.38;
+    public static double autoTurnErrorMax = 3;
+    public static double autoTurnKP = 0.60;
+    public static double autoTurnKI = 0.06;
+    public static double autoTurnKD = 0.54;
+    public static double autoTurnKF = 1;
     public static double goalOffset = 0;
+    private double integral = 0;
+    private double maxIntegral = 20; // clamp
     private double lastError = 0.0;
     private double lastTime = 0.0;   // seconds
 
@@ -102,7 +110,8 @@ public class MainTeleOpBLUE extends CommandOpMode {
         rgbHelper = new GobildaRGBIndicatorHelper(hardwareMap);
         intakeBeamBreak = new BeamBreakHelper(hardwareMap, "intakeBeamBreak", 0);
         follower = Constants.createFollower(hardwareMap);
-
+        dash = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
         // Default Commands
         // Intake Command
         in.setDefaultCommand(new IntakeCommand(in, out, driver));
@@ -158,6 +167,8 @@ public class MainTeleOpBLUE extends CommandOpMode {
         telemetry.addLine("ROBOT READY!");
         telemetry.addData("Team ID:", AlliancePresets.getAllianceShooterTag());
         telemetry.addData("Current Alliance Tag", limelight.getLimelightAllianceTagID());
+
+
         telemetry.update();
     }
 
@@ -218,8 +229,8 @@ public class MainTeleOpBLUE extends CommandOpMode {
             double dt = currentTime - lastTime; //new
             headingSetPoint = getRobotPositionAngle(x, y);
 
-            error = headingSetPoint - Math.toDegrees(heading);
-            if (Math.abs(error-180) <autoTurnErrorMax){
+            error = (Math.toDegrees(heading)) - headingSetPoint;
+            if (Math.abs(error) <autoTurnErrorMax){
                 error = 0;
             }
             else {
@@ -231,12 +242,28 @@ public class MainTeleOpBLUE extends CommandOpMode {
                 }
             }
 
+
+            //kd stuff
             double derivative = 0;
             if (dt > 0) {
                 derivative = (error - lastError) / dt;
+                integral = 0;
             } //new
 
-            rotate = (autoTurnKP * error) + (autoTurnKD * derivative); //new
+            //ki stuff
+            if (dt > 0 && Math.abs(error) < 30) { // only integrate near target
+                integral += error * dt;
+                integral = Math.min(Math.max(integral, -maxIntegral), maxIntegral);
+            }
+
+
+            //kf stuff
+            double feedforward = 0;
+            if (error != 0) {
+                feedforward = autoTurnKF * Math.signum(error);
+            }
+
+            rotate = (autoTurnKP * error) + (autoTurnKI * integral) + (autoTurnKD * derivative) + feedforward; //new
             rotate = Math.min(Math.max(rotate, -maxTurnVelocity), maxTurnVelocity);
 
             lastError = error;
@@ -328,6 +355,11 @@ public class MainTeleOpBLUE extends CommandOpMode {
         telemetry.addData("Heading variable (temp)", Math.toDegrees(heading));
         telemetry.addData("error?)", error);
         telemetry.update();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("error", error);
+        packet.put("heading", headingSetPoint);
+        dash.sendTelemetryPacket(packet);
     }
 
     private Pose2D driveFieldRelative(double forward, double right, double rotate) {
@@ -419,7 +451,7 @@ public class MainTeleOpBLUE extends CommandOpMode {
         double dxx = GOAL_POS_BLUE.getX() - robotX + goalOffset;
         double dyy = GOAL_POS_BLUE.getY() - robotY;
         double angleToGoal = Math.atan(dyy / dxx);
-        return (Math.toDegrees(angleToGoal) + 180);
+        return (Math.toDegrees(angleToGoal));
     }
 
 
