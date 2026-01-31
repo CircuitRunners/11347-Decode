@@ -32,7 +32,7 @@ public class BlueSideClose12 extends OpMode {
     private int pathState = 0;
     private int ballsToShoot;
 
-    private int CLOSE_SHOOTER_POWER = 3700;
+    private int CLOSE_SHOOTER_POWER = 3550;
 
     Timer shootTime = new Timer();
     private StaticShooter shooter;
@@ -45,7 +45,7 @@ public class BlueSideClose12 extends OpMode {
     private boolean headingLockEnabled;
     private BeamBreakHelper intakeBeamBreak, outtakeBeamBreak;
     private Thread outtakeThread;
-    private final Pose startPose = new Pose(110.0, 135.5, Math.toRadians(0));
+    private final Pose startPose = new Pose(33.00, 135.5, Math.toRadians(180));
 
     private PathChain line1, line2, line3, line4, line5, line6,
             line7, line8, line9, line10, line11, line12, line13;
@@ -54,23 +54,23 @@ public class BlueSideClose12 extends OpMode {
         line1 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(33.500, 135.500), new Pose(44.000, 100.000))
+                        new BezierLine(new Pose(33.00, 135.500), new Pose(43.000, 100.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180 - 0), Math.toRadians(180 - 46))
+                .setLinearHeadingInterpolation(Math.toRadians(180 - 0), Math.toRadians(180 - 42))
                 .build();
 
         line2 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(44.000, 100.000), new Pose(47.000, 84.000))
+                        new BezierLine(new Pose(43.000, 100.000), new Pose(47.000, 84.000))
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180 - 46), Math.toRadians(180 - 0))
+                .setLinearHeadingInterpolation(Math.toRadians(180 - 42), Math.toRadians(180 - 0))
                 .build();
 
         line3 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(47.000, 84.000), new Pose(19.000, 84.000))//20
+                        new BezierLine(new Pose(47.000, 84.000), new Pose(17.000, 84.000))//20
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
@@ -79,9 +79,9 @@ public class BlueSideClose12 extends OpMode {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(19.000, 84.000),
+                                new Pose(17.000, 84.000),
                                 new Pose(26.500, 78.000),
-                                new Pose(27.500, 76.000)//26
+                                new Pose(23.00, 76.000)//26
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -90,7 +90,7 @@ public class BlueSideClose12 extends OpMode {
         line5 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(27.500, 76.000), new Pose(19.000, 76.000))
+                        new BezierLine(new Pose(23.00, 76.000), new Pose(15.000, 76.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
@@ -98,7 +98,7 @@ public class BlueSideClose12 extends OpMode {
         line6 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(15.000, 76.000), new Pose(44.000, 100.000))
+                        new BezierLine(new Pose(15.000, 76.000), new Pose(43.000, 100.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180 - 46))
                 .build();
@@ -106,7 +106,7 @@ public class BlueSideClose12 extends OpMode {
         line7 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(44.000, 100.000), new Pose(47.000, 60.000))
+                        new BezierLine(new Pose(43.000, 100.000), new Pose(47.000, 60.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180 - 46), Math.toRadians(180))
                 .build();
@@ -114,7 +114,7 @@ public class BlueSideClose12 extends OpMode {
         line8 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(47.000, 60.000), new Pose(10.500, 60.000))//12
+                        new BezierLine(new Pose(47.000, 60.000), new Pose(8.500, 60.000))//12
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
@@ -125,7 +125,7 @@ public class BlueSideClose12 extends OpMode {
                         new BezierCurve(
                                 new Pose(10.500, 60.000),
                                 new Pose(46.000, 64.000),
-                                new Pose(44.000, 100.000)
+                                new Pose(43.000, 100.000)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180 - 46))
@@ -134,7 +134,7 @@ public class BlueSideClose12 extends OpMode {
         line10 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(44.000, 100.000), new Pose(47.000, 35.000))
+                        new BezierLine(new Pose(43.000, 100.000), new Pose(47.000, 35.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180 - 46), Math.toRadians(180))
                 .build();
@@ -142,7 +142,7 @@ public class BlueSideClose12 extends OpMode {
         line11 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(47.000, 35.000), new Pose(10.500, 36.000))//12
+                        new BezierLine(new Pose(47.000, 35.000), new Pose(8.500, 35.000))//12
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .build();
@@ -150,7 +150,7 @@ public class BlueSideClose12 extends OpMode {
         line12 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(10.500, 36.000), new Pose(44.000, 100.000))
+                        new BezierLine(new Pose(8.500, 35.000), new Pose(43.000, 100.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180 - 46))
                 .build();
@@ -158,7 +158,7 @@ public class BlueSideClose12 extends OpMode {
         line13 = follower
                 .pathBuilder()
                 .addPath(
-                        new BezierLine(new Pose(44.000, 100.000), new Pose(44.000, 75.000))
+                        new BezierLine(new Pose(43.000, 100.000), new Pose(43.000, 75.000))
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(180 - 46), Math.toRadians(180))
                 .build();
@@ -268,7 +268,7 @@ public class BlueSideClose12 extends OpMode {
         switch (pathState) {
             case 0:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.87);
+                    follower.setMaxPower(1);
                     shooter.setTargetRPM(CLOSE_SHOOTER_POWER);
                     out.aimClose();
                     setPathState(1);
@@ -285,7 +285,7 @@ public class BlueSideClose12 extends OpMode {
 
             case 2:
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3.5 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot ) && pathTimer.getElapsedTimeSeconds() < 5.5 && pathTimer.getElapsedTimeSeconds() > 0.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
@@ -334,7 +334,7 @@ public class BlueSideClose12 extends OpMode {
 
             case 7:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.87);
+                    follower.setMaxPower(1);
                     follower.followPath(line6);
                     setPathState(8);
                 }
@@ -342,7 +342,7 @@ public class BlueSideClose12 extends OpMode {
 
             case 8:
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
@@ -382,7 +382,7 @@ public class BlueSideClose12 extends OpMode {
 
             case 12:
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
@@ -422,7 +422,7 @@ public class BlueSideClose12 extends OpMode {
                 break;
             case 16:
                 if (!follower.isBusy()) {
-                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 3.5 && pathTimer.getElapsedTimeSeconds() > 0.8) {
+                    if (!(outtakeBeamBreak.getBallCount() >= ballsToShoot) && pathTimer.getElapsedTimeSeconds() < 5.5) {
                         if (shooter.isAtTargetThreshold()) {
                             transfer();
                         }
