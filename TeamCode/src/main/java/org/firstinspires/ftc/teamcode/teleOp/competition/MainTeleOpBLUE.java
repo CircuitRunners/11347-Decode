@@ -79,16 +79,26 @@ public class MainTeleOpBLUE extends CommandOpMode {
     public static double headingSetPoint = 0;
     public static double maxTurnVelocity = 0.8; //need to use this more/tune this so i can get more agressive P
     private double error = 0;
-    public static double autoTurnErrorMax = 3.5;
-    public static double autoTurnKP = 0.025;
-    public static double autoTurnKI = 0.06;
-    public static double autoTurnKD = 0.0052;
-    public static double autoTurnKF = 0.3;
-    public static double goalOffset = 0;
+    private static double autoTurnErrorMax = 3.5;
+    private static double autoTurnKP = 0.025;
+    private static double autoTurnKI = 0.06;
+    private static double autoTurnKD = 0.0052;
+    private static double autoTurnKF = 0.3;
+    private static double goalOffset = 0;
     private double integral = 0;
     private double maxIntegral = 20; // clamp
     private double lastError = 0.0;
     private double lastTime = 0.0;   // seconds
+    private double tempx = 0;
+    private double tempy = 0;
+
+    //relocalize
+    public static double limelightRelocalizeOffset = 5;
+    // inches — tune as needed
+    public static double MIN_CORRECTION = 2.0;   // ignore noise
+    public static double MAX_CORRECTION = 12.0;  // ignore bad tag solves
+    private double finalX = 0;
+    private double finalY = 0;
 
     @Override
     public void initialize() {
@@ -188,6 +198,7 @@ public class MainTeleOpBLUE extends CommandOpMode {
         double heading = p.getHeading(AngleUnit.RADIANS);
 
         calculateHoodPos(x, y, heading, follower.getVelocity());
+        updateCoordinatesWithAprilTag();
 
 
         double forward = driver.getLeftY(); // Forwards/backwards
@@ -342,6 +353,7 @@ public class MainTeleOpBLUE extends CommandOpMode {
         telemetry.addData("Aiming Servo Pos: ", out.getAimPos());
         telemetry.addData("Beam Break State: ", intakeBeamBreak.isBeamBroken());
         telemetry.addData("RGB Colour", rgbHelper.getCurrentColour());
+        telemetry.addData("Hood pos", hoodPos);
         telemetry.addLine();
         telemetry.addLine("----  Pinpoint Data  ----");
         telemetry.addData("Position", data);
@@ -349,11 +361,16 @@ public class MainTeleOpBLUE extends CommandOpMode {
         telemetry.addData("Status", pinpoint.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", pinpoint.getFrequency());
         telemetry.addData("Soft limit On?", aimServoLimit);
-        telemetry.addData("Hood pos", hoodPos);
+        telemetry.addLine();
+        telemetry.addLine("----  Physics Data  ----");
         telemetry.addData("Shooter Predicted Vel",motorRPM);
         telemetry.addData("Running auto lock", runAutoTurn);
         telemetry.addData("Heading variable (temp)", Math.toDegrees(heading));
         telemetry.addData("error?)", headingSetPoint);
+        telemetry.addData("finalx", finalX);
+        telemetry.addData("finaly",finalY);
+        telemetry.addData("finalx", tempx);
+        telemetry.addData("finaly",tempy);
         telemetry.update();
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -394,17 +411,32 @@ public class MainTeleOpBLUE extends CommandOpMode {
     public void updateCoordinatesWithAprilTag() {
         limelight.limelight.updateRobotOrientation(follower.getHeading());
         limelight.limelight.pipelineSwitch(0);
+
         LLResult result = limelight.limelight.getLatestResult();
         if (result != null && result.isValid()) {
             Pose3D mt1Pose = result.getBotpose();
             if (mt1Pose != null) {
-                double finalX = (mt1Pose.getPosition().y * METERS_TO_INCH) + 72.0;
-                double finalY = (-mt1Pose.getPosition().x * METERS_TO_INCH) + 72.0;
-                follower.setPose(new Pose(finalX, finalY, follower.getHeading()));
-                gamepad1.rumble(500);
+
+                finalX = (mt1Pose.getPosition().y * METERS_TO_INCH) + 72.0;
+                finalY = (-mt1Pose.getPosition().x * METERS_TO_INCH) + 72.0;
+
+                double dx = finalX - follower.getPose().getX();
+                double dy = finalY - follower.getPose().getY();
+                double dist = Math.hypot(dx, dy);
+
+
+
+                if (dist > MIN_CORRECTION && dist < MAX_CORRECTION
+                        && (Math.abs(dx) > limelightRelocalizeOffset
+                        || Math.abs(dy) > limelightRelocalizeOffset)) {
+                    //follower.setPose(new Pose(finalX, finalY, follower.getHeading()));
+                    tempx = finalX;
+                    tempy = finalY;
+                }
             }
         }
     }
+
 
     public void calculateHoodPos(double robotX, double robotY, double robotHeading, Vector robotVelocity) {
         // Horizontal distance to goal
@@ -453,6 +485,8 @@ public class MainTeleOpBLUE extends CommandOpMode {
         double angleToGoal = Math.atan(dyy / dxx);
         return (Math.toDegrees(angleToGoal));
     }
+
+
 
 
 
